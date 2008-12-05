@@ -87,7 +87,7 @@ Subject: %SUBJECT%
 %STARTSECTION{"thanks"}%
 ---+ Notification
 %SENDEMAIL%
-<input type="button" value="Ok" class="twikiButton" onclick="window.location.href='%URLPARAM{"origurl" default="%SCRIPTURLPATH{view}%/%BASEWEB%/%BASETOPIC%"}%'" />
+<input type="button" value="Ok" class="foswikiButton" onclick="window.location.href='%URLPARAM{"origurl" default="%SCRIPTURLPATH{view}%/%BASEWEB%/%BASETOPIC%"}%'" />
 %ENDSECTION{"thanks"}%
 
 -->
@@ -135,7 +135,7 @@ Subject: %SUBJECT%
 %STARTSECTION{"thanks"}%
 ---+ Notification
 %SENDEMAIL%
-<input type="button" value="Ok" class="twikiButton" onclick="window.location.href='%URLPARAM{"origurl" default="%SCRIPTURLPATH{view}%/%BASEWEB%/%BASETOPIC%"}%'" />
+<input type="button" value="Ok" class="foswikiButton" onclick="window.location.href='%URLPARAM{"origurl" default="%SCRIPTURLPATH{view}%/%BASEWEB%/%BASETOPIC%"}%'" />
 %ENDSECTION{"thanks"}%
 -->
 

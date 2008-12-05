@@ -420,7 +420,7 @@ sub wrapHtmlNotificationContainer {
 <input type="hidden" name="param2" value="%ERRORMESSAGE%" />
 <input type="hidden" name="param3" value="" />
 <input type="hidden" name="param4" value="" />
-<input type="submit" class="twikiButton" value="%ERRORBUTTON%"  />
+<input type="submit" class="foswikiButton" value="%ERRORBUTTON%"  />
 </form>
 HERE
           $errorForm =~ s/%OOPSURL%/$oopsUrl/go;
