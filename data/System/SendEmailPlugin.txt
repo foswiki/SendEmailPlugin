@@ -362,6 +362,8 @@ plugin on the server where Foswiki is running.
    * Unzip ==%TOPIC%.zip== in your Foswiki installation directory. Content:
      | *File:* | *Description:* |
 %$MANIFEST%
+   * Add the following lines to your =LocalSite.cfg=:
+     <verbatim>$Foswiki::cfg{SwitchBoard}{sendemail} = ['Foswiki::Plugins::SendEmailPlugin::Core', 'sendEmail', {sendemail => 1}];</verbatim>
 
 ---++ Plugin Info
 
