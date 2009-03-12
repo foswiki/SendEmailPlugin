@@ -2,9 +2,6 @@
 #
 # Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (C) 1999-2006 Peter Thoeny, peter@thoeny.org
-# and TWiki Contributors.
-#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
@@ -18,15 +15,21 @@
 # As per the GPL, removal of this notice is prohibited.
 
 BEGIN {
-    # See the 'view' script for a description of what this does
-    if( $ENV{"SCRIPT_FILENAME"} &&
-        $ENV{"SCRIPT_FILENAME"} =~ /^(.+)\/[^\/]+$/ ) {
-        chdir $1;
+    if ( defined $ENV{GATEWAY_INTERFACE} ) {
+        $Foswiki::cfg{Engine} = 'Foswiki::Engine::CGI';
+        use CGI::Carp qw(fatalsToBrowser);
+        $SIG{__DIE__} = \&CGI::Carp::confess;
     }
-    unshift @INC, '.';
+    else {
+        $Foswiki::cfg{Engine} = 'Foswiki::Engine::CLI';
+        require Carp;
+        $SIG{__DIE__} = \&Carp::confess;
+    }
+    $ENV{FOSWIKI_ACTION} = 'sendemail';
+    @INC = ('.', grep { $_ ne '.' } @INC);
     require 'setlib.cfg';
 }
 
-use TWiki::UI;
-use TWiki::Plugins::SendEmailPlugin::Core;
-TWiki::UI::run( \&TWiki::Plugins::SendEmailPlugin::Core::sendEmail, sendEmail => 1 );
+use Foswiki;
+use Foswiki::UI;
+$Foswiki::engine->run();

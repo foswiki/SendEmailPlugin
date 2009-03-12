@@ -1,0 +1,6 @@
+bin/sendemail 0755 CGI script
+templates/sendemail.tmpl 0644 Email template
+data/System/SendEmailPlugin.txt 0644 Documentation
+lib/Foswiki/Plugins/SendEmailPlugin.pm 0644 Plugin stub
+lib/Foswiki/Plugins/SendEmailPlugin/Core.pm 0644 Plugin core
+pub/System/SendEmailPlugin/sendemailplugin.css 0777 CSS styles

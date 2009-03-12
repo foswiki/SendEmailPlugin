@@ -59,25 +59,25 @@ Subject: %SUBJECT%
 <input type="hidden" name="successsection" value="thanks" />
 <fieldset>
 <legend><b>Send Email</b></legend>
-<div class="twikiFormSteps">
-<div class="twikiFormStep">
+<div class="foswikiFormSteps">
+<div class="foswikiFormStep">
 <h3>To:</h3>
-<input class="twikiInputField" id="to" name="to" size="30" type="text" value="%URLPARAM{"to"}%" />
+<input class="foswikiInputField" id="to" name="to" size="30" type="text" value="%URLPARAM{"to"}%" />
 </div>
-<div class="twikiFormStep">
+<div class="foswikiFormStep">
 <h3>CC:</h3>
-<input type="text" class="twikiInputField" id="cc" name="cc" size="30"  value="%URLPARAM{"cc"}%" />
+<input type="text" class="foswikiInputField" id="cc" name="cc" size="30"  value="%URLPARAM{"cc"}%" />
 </div>
-<div class="twikiFormStep">
+<div class="foswikiFormStep">
 <h3>Subject:</h3>
-<input type="text" class="twikiInputField" id="subject" name="subject" size="70" value="%URLPARAM{"subject"}%" />
+<input type="text" class="foswikiInputField" id="subject" name="subject" size="70" value="%URLPARAM{"subject"}%" />
 </div>
-<div class="twikiFormStep">
+<div class="foswikiFormStep">
 <h3>Message:</h3>
-<textarea class="twikiInputField" cols="70" name="body" rows="6" style="width:100%">%URLPARAM{"body"}%</textarea>
+<textarea class="foswikiInputField" cols="70" name="body" rows="6" style="width:100%">%URLPARAM{"body"}%</textarea>
 </div>
-<div class="twikiFormStep">
-<input type="submit" class="twikiSubmit" value="Send" />
+<div class="foswikiFormStep">
+<input type="submit" class="foswikiSubmit" value="Send" />
 </div>
 </div>
 </fieldset>
@@ -99,25 +99,25 @@ Subject: %SUBJECT%
 <input type="hidden" name="successsection" value="thanks" />
 <fieldset>
 <legend><b>Send Email</b></legend>
-<div class="twikiFormSteps">
-<div class="twikiFormStep">
+<div class="foswikiFormSteps">
+<div class="foswikiFormStep">
 ---+++!! To:
-<input class="twikiInputField" id="to" name="to" size="30" type="text" value="%URLPARAM{"to"}%" />
+<input class="foswikiInputField" id="to" name="to" size="30" type="text" value="%URLPARAM{"to"}%" />
 </div>
-<div class="twikiFormStep">
+<div class="foswikiFormStep">
 ---+++!! CC:
-<input type="text" class="twikiInputField" id="cc" name="cc" size="30"  value="%URLPARAM{"cc"}%" />
+<input type="text" class="foswikiInputField" id="cc" name="cc" size="30"  value="%URLPARAM{"cc"}%" />
 </div>
-<div class="twikiFormStep">
+<div class="foswikiFormStep">
 ---+++!! Subject:
-<input type="text" class="twikiInputField" id="subject" name="subject" size="70" value="%URLPARAM{"subject"}%" />
+<input type="text" class="foswikiInputField" id="subject" name="subject" size="70" value="%URLPARAM{"subject"}%" />
 </div>
-<div class="twikiFormStep">
+<div class="foswikiFormStep">
 ---+++!! Message:
-<textarea class="twikiInputField" cols="70" name="body" rows="6" style="width:100%">%URLPARAM{"body"}%</textarea>
+<textarea class="foswikiInputField" cols="70" name="body" rows="6" style="width:100%">%URLPARAM{"body"}%</textarea>
 </div>
-<div class="twikiFormStep">
-<input type="submit" class="twikiSubmit" value="Send" />
+<div class="foswikiFormStep">
+<input type="submit" class="foswikiSubmit" value="Send" />
 </div>
 </div>
 </fieldset>
@@ -194,7 +194,7 @@ name="body"
 type="textarea"
 rows="10"
 cols="80"
-cssclass="twikiHidden"
+cssclass="foswikiHidden"
 default="$Name
 $Email
 $Company
@@ -274,7 +274,7 @@ name="body"
 type="textarea"
 rows="10"
 cols="80"
-cssclass="twikiHidden"
+cssclass="foswikiHidden"
 default="$Name
 $Email
 $Company
@@ -311,7 +311,7 @@ If you have a form with the fields =Title= and =Summary= and want to post the va
 </verbatim>
    * preserve linebreaks by putting them in a textarea:
    <verbatim>
-<textarea name="body" class="twikiHidden" cols="80" rows="6">
+<textarea name="body" class="foswikiHidden" cols="80" rows="6">
 Title: %FORMFIELD{"Title"}%
 Summary: %FORMFIELD{"Summary"}%
 </textarea>
@@ -356,25 +356,21 @@ Summary: %FORMFIELD{"Summary"}%
 
 __Note:__ You do not need to install anything on the browser to use this
 plugin. The following instructions are for the administrator who installs the
-plugin on the server where TWiki is running. 
+plugin on the server where Foswiki is running. 
 
    * Download the ZIP file from the Plugin web (see below)
-   * Unzip ==%TOPIC%.zip== in your twiki installation directory. Content:
+   * Unzip ==%TOPIC%.zip== in your Foswiki installation directory. Content:
      | *File:* | *Description:* |
 %$MANIFEST%
-
-   * If you install this plugin on a TWiki-5 engine you will need to add the following lines
-     to your =LocalSite.cfg=:
-     <verbatim>$TWiki::cfg{SwitchBoard}{sendemail} = ['TWiki::Plugins::SendEmailPlugin::Core', 'sendEmail', {sendemail => 1}];</verbatim>
-     and redirect all calls to =sendemail= to =sendemail-5= in your apache configuration.
 
 ---++ Plugin Info
 
 |  Plugin Author: | TWiki:Main.ArthurClemens |
 |  Copyright: | &copy; 2007 Arthur Clemens; 2008 Michael Daum |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
-|  Plugin Version: | 1.2.3, 06 Nov 2008  |
+|  Plugin Version: | 1.3 (12 Mar 2009)  |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  12 Mar 2009 | 1.3 Foswiki version. |
 |  06 Nov 2008 | 1.2.3 Michael Daum: fixed CC emails; fixed css in docu |
 |  17 Oct 2008 | 1.2.1 Michael Daum: added support for TWiki-5; fixed sending emails to login names |
 |  26 Jun 2008 | 1.2.0 Michael Daum: \
@@ -395,6 +391,5 @@ plugin on the server where TWiki is running.
 |  Other Dependencies: | none |
 |  Perl Version: | 5.005 |
 |  Plugin Home: | http://foswiki.org/Extensions/%TOPIC% |
-|  Feedback: | http://foswiki.org/Extensions/%TOPIC%Dev |
+|  Support: | http://foswiki.org/Support/%TOPIC% |
 
-__Related Topics:__ %SYSTEMWEB%.DefaultPreferences, %USERSWEB%.SitePreferences, [[%SYSTEMWEB%.Plugins][Plugins]]

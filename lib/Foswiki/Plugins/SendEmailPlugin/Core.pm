@@ -1,8 +1,8 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (c) 2006 by Meredith Lesly, Kenneth Lavrsen
+# Copyright (c) 2007-2009 by Arthur Clemens, Michael Daum
 #
-# and TWiki Contributors. All Rights Reserved. TWiki Contributors
+# and Foswiki Contributors. All Rights Reserved. Foswiki Contributors
 # are listed in the AUTHORS file in the root of this distribution.
 # NOTE: Please extend that file, not this notice.
 #
@@ -16,14 +16,14 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-# For licensing info read LICENSE file in the TWiki root.
+# For licensing info read LICENSE file in the Foswiki root.
 
-package TWiki::Plugins::SendEmailPlugin::Core;
+package Foswiki::Plugins::SendEmailPlugin::Core;
 
 # Always use strict to enforce variable scoping
 use strict;
-use TWiki::Func;
-use TWiki::Plugins;
+use Foswiki::Func;
+use Foswiki::Plugins;
 
 use vars qw( $debug $emailRE );
 
@@ -54,7 +54,7 @@ writes a debug message if the $debug flag is set
 =cut
 
 sub writeDebug {
-  TWiki::Func::writeDebug("SendEmailPlugin -- $_[0]") 
+  Foswiki::Func::writeDebug("SendEmailPlugin -- $_[0]") 
     if $debug;
 }
 
@@ -66,9 +66,9 @@ some init steps
 
 sub init {
   my $session = shift;
-  $TWiki::Plugins::SESSION ||= $session;
-  $debug = TWiki::Func::getPreferencesFlag("SENDEMAILPLUGIN_DEBUG");
-  $emailRE = TWiki::Func::getRegularExpression('emailAddrRegex');
+  $Foswiki::Plugins::SESSION ||= $session;
+  $debug = Foswiki::Func::getPreferencesFlag("SENDEMAILPLUGIN_DEBUG");
+  $emailRE = Foswiki::Func::getRegularExpression('emailAddrRegex');
 }
 
 
@@ -84,7 +84,7 @@ sub sendEmail {
     writeDebug("called sendEmail()");
     init($session);
 
-    my $query = TWiki::Func::getCgiQuery();
+    my $query = Foswiki::Func::getCgiQuery();
     my $errorMessage = '';
 
     return finishSendEmail( $session, $ERROR_STATUS{'error'} ) 
@@ -105,8 +105,8 @@ sub sendEmail {
         $addrs = $thisTo;
       } else {
         # get TO user info
-        my $wikiName = TWiki::Func::getWikiName($thisTo);
-        my @addrs = TWiki::Func::wikinameToEmails($wikiName);
+        my $wikiName = Foswiki::Func::getWikiName($thisTo);
+        my @addrs = Foswiki::Func::wikinameToEmails($wikiName);
         $addrs = $addrs[0] if @addrs;
 
         unless ($addrs) { 
@@ -124,7 +124,7 @@ sub sendEmail {
           matchesPreference('DENY', 'MAILTO', $thisTo)) {
         $errorMessage = $ERROR_NO_TO_PERMISSION;
         $errorMessage =~ s/\$EMAIL/$thisTo/go;
-        TWiki::Func::writeWarning($errorMessage);
+        Foswiki::Func::writeWarning($errorMessage);
         return finishSendEmail( $session, $ERROR_STATUS{'error'},
           $errorMessage);
       }
@@ -140,15 +140,15 @@ sub sendEmail {
 
     unless ($from) {
       # get from user settings
-      my $emails = TWiki::Func::wikiToEmail();
+      my $emails = Foswiki::Func::wikiToEmail();
       my @emails = split(/\s*,*\s/, $emails);
       $from = shift @emails if @emails;
     }
 
     unless ($from) {
       # fallback to webmaster
-      $from = $TWiki::cfg{WebMasterEmail} || 
-        TWiki::Func::getPreferencesValue('WIKIWEBMASTER')
+      $from = $Foswiki::cfg{WebMasterEmail} || 
+        Foswiki::Func::getPreferencesValue('WIKIWEBMASTER')
     }
 
     # validate FROM
@@ -159,7 +159,7 @@ sub sendEmail {
         matchesPreference('DENY', 'MAILFROM', $from)) {
       $errorMessage = $ERROR_NO_FROM_PERMISSION;
       $errorMessage =~ s/\$EMAIL/$from/go;
-      TWiki::Func::writeWarning($errorMessage);
+      Foswiki::Func::writeWarning($errorMessage);
       return finishSendEmail( $session, $ERROR_STATUS{'error'}, 
         $errorMessage);
     }
@@ -187,8 +187,8 @@ sub sendEmail {
         } else {
 
           # get from user info
-          my $wikiName = TWiki::Func::getWikiName($thisCC);
-          my @addrs = TWiki::Func::wikinameToEmails($wikiName);
+          my $wikiName = Foswiki::Func::getWikiName($thisCC);
+          my @addrs = Foswiki::Func::wikinameToEmails($wikiName);
           $addrs = $addrs[0] if @addrs;
 
           unless ($addrs) {
@@ -206,7 +206,7 @@ sub sendEmail {
              matchesPreference('DENY', 'MAILCC', $thisCC)) {
           $errorMessage = $ERROR_NO_CC_PERMISSION;
           $errorMessage =~ s/\$EMAIL/$thisCC/go;
-          TWiki::Func::writeWarning($errorMessage);
+          Foswiki::Func::writeWarning($errorMessage);
           return finishSendEmail( $session, $ERROR_STATUS{'error'},
             $errorMessage);
         }
@@ -227,7 +227,7 @@ sub sendEmail {
 
     # get template
     my $templateName = $query->param('template') || 'sendemail';
-    my $template = TWiki::Func::readTemplate($templateName);
+    my $template = Foswiki::Func::readTemplate($templateName);
     unless ($template) {
       $template = <<'HERE';
 From: %FROM%
@@ -250,7 +250,7 @@ HERE
     writeDebug("mail=\n$mail");
 
     # send email
-    $errorMessage = TWiki::Func::sendEmail( $mail, $RETRY_COUNT );
+    $errorMessage = Foswiki::Func::sendEmail( $mail, $RETRY_COUNT );
 
     # finally
     my $errorStatus =
@@ -275,8 +275,8 @@ sub matchesPreference {
   writeDebug("called matchesPreference($mode, $key, $value)");
   my $pattern;
 
-  $pattern = TWiki::Func::getPreferencesValue(uc($mode.$key));
-  $pattern = TWiki::Func::getPreferencesValue(uc('SendEmailPlugin_'.$mode.$key))
+  $pattern = Foswiki::Func::getPreferencesValue(uc($mode.$key));
+  $pattern = Foswiki::Func::getPreferencesValue(uc('SendEmailPlugin_'.$mode.$key))
     unless defined $pattern;
 
   return ($mode =~ /ALLOW/i?1:0) unless $pattern;
@@ -300,7 +300,7 @@ sub handleSendEmailTag {
     init();
     addHeader();
 
-    my $query = TWiki::Func::getCgiQuery();
+    my $query = Foswiki::Func::getCgiQuery();
     return '' if !$query;
 
     my $errorStatus = $query->param($ERROR_STATUS_TAG);
@@ -314,7 +314,7 @@ sub handleSendEmailTag {
 
     unless (defined $feedbackSuccess) {
       $feedbackSuccess =
-        TWiki::Func::getPreferencesValue(
+        Foswiki::Func::getPreferencesValue(
           "SENDEMAILPLUGIN_EMAIL_SENT_SUCCESS_MESSAGE")
         || '';
     }
@@ -323,7 +323,7 @@ sub handleSendEmailTag {
     my $feedbackError = $params->{'feedbackError'};
     unless (defined $feedbackError) {
       $feedbackError =
-        TWiki::Func::getPreferencesValue(
+        Foswiki::Func::getPreferencesValue(
           "SENDEMAILPLUGIN_EMAIL_SENT_ERROR_MESSAGE")
         || '';
     }
@@ -346,7 +346,7 @@ sub handleSendEmailTag {
 sub finishSendEmail {
     my ( $session, $errorStatus, $errorMessage, $redirectUrl ) = @_;
 
-    my $query = TWiki::Func::getCgiQuery();
+    my $query = Foswiki::Func::getCgiQuery();
 
     writeDebug("_finishSendEmail errorStatus=$errorStatus;")
       if $errorStatus;
@@ -363,7 +363,7 @@ sub finishSendEmail {
 
     my $web   = $session->{webName};
     my $topic = $session->{topicName};
-    my $origUrl = TWiki::Func::getScriptUrl($web, $topic, 'view');
+    my $origUrl = Foswiki::Func::getScriptUrl($web, $topic, 'view');
 
     $query->param( -name => 'origurl', -value => $origUrl);
 
@@ -374,7 +374,7 @@ sub finishSendEmail {
       if $section;
       
     $redirectUrl ||= $origUrl;
-    TWiki::Func::redirectCgiQuery( undef, $redirectUrl, 1 );
+    Foswiki::Func::redirectCgiQuery( undef, $redirectUrl, 1 );
 
     # would pass '#'=>$NOTIFICATION_ANCHOR_NAME but the anchor removes
     # the ERROR_STATUS_TAG param
@@ -391,7 +391,7 @@ sub addHeader {
 @import url("%PUBURL%/%SYSTEMWEB%/SendEmailPlugin/sendemailplugin.css");
 </style>
 EOF
-    TWiki::Func::addToHEAD( 'SENDEMAILPLUGIN', $header );
+    Foswiki::Func::addToHEAD( 'SENDEMAILPLUGIN', $header );
 }
 
 =pod
@@ -411,7 +411,7 @@ sub wrapHtmlNotificationContainer {
       if ( length $errorMessage < 256 ) {
           $message .= ' '.$errorMessage;
       } else {
-          my $oopsUrl = TWiki::Func::getOopsUrl( $web, $topic, 'oopsgeneric' );
+          my $oopsUrl = Foswiki::Func::getOopsUrl( $web, $topic, 'oopsgeneric' );
           $errorMessage = '<verbatim>' . $errorMessage . '</verbatim>';
           my $errorForm = <<'HERE';
 <form enctype="application/x-www-form-urlencoded" name="mailerrorfeedbackform" action="%OOPSURL%" method="POST">
