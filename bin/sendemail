@@ -26,7 +26,7 @@ BEGIN {
         $SIG{__DIE__} = \&Carp::confess;
     }
     $ENV{FOSWIKI_ACTION} = 'sendemail';
-    @INC = ('.', grep { $_ ne '.' } @INC);
+    @INC = ( '.', grep { $_ ne '.' } @INC );
     require 'setlib.cfg';
 }
 

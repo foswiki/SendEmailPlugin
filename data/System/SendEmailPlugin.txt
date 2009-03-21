@@ -86,7 +86,7 @@ Subject: %SUBJECT%
 %SENDEMAIL%
 <!--
 %STARTSECTION{"thanks"}%
----+ Notification
+---+!! Notification
 %SENDEMAIL%
 <input type="button" value="Ok" class="foswikiButton" onclick="window.location.href='%URLPARAM{"origurl" default="%SCRIPTURLPATH{view}%/%BASEWEB%/%BASETOPIC%"}%'" />
 %ENDSECTION{"thanks"}%
