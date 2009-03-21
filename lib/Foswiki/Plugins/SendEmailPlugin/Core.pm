@@ -37,15 +37,16 @@ my %ERROR_STATUS                 = (
     'noerror' => 1,
     'error'   => 2,
 );
-my $ERROR_TITLE               = ' <nop>%SYSTEMWEB%.SendEmailPlugin send error ';
-my $ERROR_BUTTON_LABEL        = 'Show error message';
-my $ERROR_NOT_VALID_EMAIL     = '\'$EMAIL\' is not a valid e-mail address or account';
-my $ERROR_EMPTY_TO_EMAIL      = 'You must pass a \'to\' e-mail address';
-my $ERROR_EMPTY_FROM_EMAIL    = 'You must pass a \'from\' e-mail address';
-my $ERROR_NO_FROM_PERMISSION  = 'No permission to send an e-mail from \'$EMAIL\'';
-my $ERROR_NO_TO_PERMISSION    = 'No permission to send an e-mail to \'$EMAIL\'';
-my $ERROR_NO_CC_PERMISSION    = 'No permission to cc an e-mail to \'$EMAIL\'';
-
+my $ERROR_TITLE;
+my $ERROR_BUTTON_LABEL;
+my $EMAIL_SENT_SUCCESS_MESSAGE;
+my $EMAIL_SENT_ERROR_MESSAGE;
+my $ERROR_INVALID_ADDRESS;
+my $ERROR_EMPTY_TO_EMAIL;
+my $ERROR_EMPTY_FROM_EMAIL;
+my $ERROR_NO_PERMISSION_FROM;
+my $ERROR_NO_PERMISSION_TO;
+my $ERROR_NO_PERMISSION_CC;
 
 =pod
 
@@ -54,8 +55,8 @@ writes a debug message if the $debug flag is set
 =cut
 
 sub writeDebug {
-  Foswiki::Func::writeDebug("SendEmailPlugin -- $_[0]") 
-    if $debug;
+    Foswiki::Func::writeDebug("SendEmailPlugin -- $_[0]")
+      if $debug;
 }
 
 =pod
@@ -65,12 +66,42 @@ some init steps
 =cut
 
 sub init {
-  my $session = shift;
-  $Foswiki::Plugins::SESSION ||= $session;
-  $debug = Foswiki::Func::getPreferencesFlag("SENDEMAILPLUGIN_DEBUG");
-  $emailRE = Foswiki::Func::getRegularExpression('emailAddrRegex');
+    my $session = shift;
+    $Foswiki::Plugins::SESSION ||= $session;
+    my $pluginName = $Foswiki::Plugins::SendEmailPlugin::pluginName;
+    $debug = $Foswiki::cfg{Plugins}{$pluginName}{Debug} || 0;
+    $emailRE = Foswiki::Func::getRegularExpression('emailAddrRegex');
+    initMessageStrings();
 }
 
+sub initMessageStrings {
+    my $session = shift;
+
+    my $language = Foswiki::Func::getPreferencesValue("LANGUAGE") || 'en';
+    my $pluginName = $Foswiki::Plugins::SendEmailPlugin::pluginName;
+
+    $ERROR_TITLE =
+      $Foswiki::cfg{Plugins}{$pluginName}{Messages}{SendError}{$language};
+    $ERROR_BUTTON_LABEL =
+      $Foswiki::cfg{Plugins}{$pluginName}{Messages}{ButtonLabel}{$language};
+    $EMAIL_SENT_SUCCESS_MESSAGE =
+      $Foswiki::cfg{Plugins}{$pluginName}{Messages}{SentSuccess}{en};
+    $EMAIL_SENT_ERROR_MESSAGE =
+      $Foswiki::cfg{Plugins}{$pluginName}{Messages}{SentError}{$language};
+    $ERROR_INVALID_ADDRESS =
+      $Foswiki::cfg{Plugins}{$pluginName}{Messages}{InvalidAddress}{$language};
+    $ERROR_EMPTY_TO_EMAIL =
+      $Foswiki::cfg{Plugins}{$pluginName}{Messages}{EmptyTo}{$language};
+    $ERROR_EMPTY_FROM_EMAIL =
+      $Foswiki::cfg{Plugins}{$pluginName}{Messages}{EmptyFrom}{$language};
+    $ERROR_NO_PERMISSION_FROM =
+      $Foswiki::cfg{Plugins}{$pluginName}{Messages}{NoPermissionFrom}
+      {$language};
+    $ERROR_NO_PERMISSION_TO =
+      $Foswiki::cfg{Plugins}{$pluginName}{Messages}{NoPermissionTo}{$language};
+    $ERROR_NO_PERMISSION_CC =
+      $Foswiki::cfg{Plugins}{$pluginName}{Messages}{NoPermissionCc}{$language};
+}
 
 =pod
 
@@ -84,91 +115,100 @@ sub sendEmail {
     writeDebug("called sendEmail()");
     init($session);
 
-    my $query = Foswiki::Func::getCgiQuery();
+    my $query        = Foswiki::Func::getCgiQuery();
     my $errorMessage = '';
 
-    return finishSendEmail( $session, $ERROR_STATUS{'error'} ) 
+    return finishSendEmail( $session, $ERROR_STATUS{'error'} )
       unless $query;
 
     # get TO
     my $to = $query->param('to') || $query->param('To');
 
     return finishSendEmail( $session, $ERROR_STATUS{'error'},
-        $ERROR_EMPTY_TO_EMAIL ) unless $to;
+        $ERROR_EMPTY_TO_EMAIL )
+      unless $to;
 
     my @toEmails = ();
-    foreach my $thisTo (split(/\s*,\s*/, $to)) {
-      my $addrs;
+    foreach my $thisTo ( split( /\s*,\s*/, $to ) ) {
+        my $addrs;
 
-      if ($thisTo =~ /$emailRE/) {
-        # regular address
-        $addrs = $thisTo;
-      } else {
-        # get TO user info
-        my $wikiName = Foswiki::Func::getWikiName($thisTo);
-        my @addrs = Foswiki::Func::wikinameToEmails($wikiName);
-        $addrs = $addrs[0] if @addrs;
+        if ( $thisTo =~ /$emailRE/ ) {
 
-        unless ($addrs) { 
-          # no regular address and no address found in user info
-         
-          $errorMessage = $ERROR_NOT_VALID_EMAIL;
-          $errorMessage =~ s/\$EMAIL/$thisTo/go;
-          return finishSendEmail( $session, $ERROR_STATUS{'error'},
-              $errorMessage);
+            # regular address
+            $addrs = $thisTo;
         }
-      }
+        else {
 
-      # validate TO
-      if (!matchesPreference('ALLOW', 'MAILTO', $thisTo) || 
-          matchesPreference('DENY', 'MAILTO', $thisTo)) {
-        $errorMessage = $ERROR_NO_TO_PERMISSION;
-        $errorMessage =~ s/\$EMAIL/$thisTo/go;
-        Foswiki::Func::writeWarning($errorMessage);
-        return finishSendEmail( $session, $ERROR_STATUS{'error'},
-          $errorMessage);
-      }
+            # get TO user info
+            my $wikiName = Foswiki::Func::getWikiName($thisTo);
+            my @addrs    = Foswiki::Func::wikinameToEmails($wikiName);
+            $addrs = $addrs[0] if @addrs;
 
-      push @toEmails, $addrs;
+            unless ($addrs) {
+
+                # no regular address and no address found in user info
+
+                $errorMessage = $ERROR_INVALID_ADDRESS;
+                $errorMessage =~ s/\$EMAIL/$thisTo/go;
+                return finishSendEmail( $session, $ERROR_STATUS{'error'},
+                    $errorMessage );
+            }
+        }
+
+        # validate TO
+        if (  !matchesPreference( 'Allow', 'MailTo', $thisTo )
+            || matchesPreference( 'Deny', 'MailTo', $thisTo ) )
+        {
+            $errorMessage = $ERROR_NO_PERMISSION_TO;
+            $errorMessage =~ s/\$EMAIL/$thisTo/go;
+            Foswiki::Func::writeWarning($errorMessage);
+            return finishSendEmail( $session, $ERROR_STATUS{'error'},
+                $errorMessage );
+        }
+
+        push @toEmails, $addrs;
     }
-    $to = join(', ', @toEmails);
+    $to = join( ', ', @toEmails );
     writeDebug("to=$to");
-
 
     # get FROM
     my $from = $query->param('from') || $query->param('From');
 
     unless ($from) {
-      # get from user settings
-      my $emails = Foswiki::Func::wikiToEmail();
-      my @emails = split(/\s*,*\s/, $emails);
-      $from = shift @emails if @emails;
+
+        # get from user settings
+        my $emails = Foswiki::Func::wikiToEmail();
+        my @emails = split( /\s*,*\s/, $emails );
+        $from = shift @emails if @emails;
     }
 
     unless ($from) {
-      # fallback to webmaster
-      $from = $Foswiki::cfg{WebMasterEmail} || 
-        Foswiki::Func::getPreferencesValue('WIKIWEBMASTER')
+
+        # fallback to webmaster
+        $from = $Foswiki::cfg{WebMasterEmail}
+          || Foswiki::Func::getPreferencesValue('WIKIWEBMASTER');
     }
 
     # validate FROM
     return finishSendEmail( $session, $ERROR_STATUS{'error'},
-        $ERROR_EMPTY_FROM_EMAIL ) unless $from;
+        $ERROR_EMPTY_FROM_EMAIL )
+      unless $from;
 
-    if (!matchesPreference('ALLOW', 'MAILFROM', $from) || 
-        matchesPreference('DENY', 'MAILFROM', $from)) {
-      $errorMessage = $ERROR_NO_FROM_PERMISSION;
-      $errorMessage =~ s/\$EMAIL/$from/go;
-      Foswiki::Func::writeWarning($errorMessage);
-      return finishSendEmail( $session, $ERROR_STATUS{'error'}, 
-        $errorMessage);
+    if (  !matchesPreference( 'Allow', 'MailFrom', $from )
+        || matchesPreference( 'Deny', 'MailFrom', $from ) )
+    {
+        $errorMessage = $ERROR_NO_PERMISSION_FROM;
+        $errorMessage =~ s/\$EMAIL/$from/go;
+        Foswiki::Func::writeWarning($errorMessage);
+        return finishSendEmail( $session, $ERROR_STATUS{'error'},
+            $errorMessage );
     }
 
-    unless ($from =~ m/$emailRE/) {
-      $errorMessage = $ERROR_NOT_VALID_EMAIL;
-      $errorMessage =~ s/\$EMAIL/$from/go;
-      return finishSendEmail( $session, $ERROR_STATUS{'error'}, 
-        $errorMessage );
+    unless ( $from =~ m/$emailRE/ ) {
+        $errorMessage = $ERROR_INVALID_ADDRESS;
+        $errorMessage =~ s/\$EMAIL/$from/go;
+        return finishSendEmail( $session, $ERROR_STATUS{'error'},
+            $errorMessage );
     }
     writeDebug("from=$from");
 
@@ -176,45 +216,49 @@ sub sendEmail {
     my $cc = $query->param('cc') || $query->param('CC') || '';
 
     if ($cc) {
-      my @ccEmails = ();
-      foreach my $thisCC (split(/\s*,\s*/, $cc)) {
-        my $addrs;
+        my @ccEmails = ();
+        foreach my $thisCC ( split( /\s*,\s*/, $cc ) ) {
+            my $addrs;
 
-        if ($thisCC =~ /$emailRE/) {
-          # normal email address
-          $addrs = $thisCC;
-        
-        } else {
+            if ( $thisCC =~ /$emailRE/ ) {
 
-          # get from user info
-          my $wikiName = Foswiki::Func::getWikiName($thisCC);
-          my @addrs = Foswiki::Func::wikinameToEmails($wikiName);
-          $addrs = $addrs[0] if @addrs;
+                # normal email address
+                $addrs = $thisCC;
 
-          unless ($addrs) {
-            # no regular address and no address found in user info
-         
-            $errorMessage = $ERROR_NOT_VALID_EMAIL;
-            $errorMessage =~ s/\$EMAIL/$thisCC/go;
-            return finishSendEmail( $session, $ERROR_STATUS{'error'},
-                $errorMessage);
-          }
+            }
+            else {
+
+                # get from user info
+                my $wikiName = Foswiki::Func::getWikiName($thisCC);
+                my @addrs    = Foswiki::Func::wikinameToEmails($wikiName);
+                $addrs = $addrs[0] if @addrs;
+
+                unless ($addrs) {
+
+                    # no regular address and no address found in user info
+
+                    $errorMessage = $ERROR_INVALID_ADDRESS;
+                    $errorMessage =~ s/\$EMAIL/$thisCC/go;
+                    return finishSendEmail( $session, $ERROR_STATUS{'error'},
+                        $errorMessage );
+                }
+            }
+
+            # validate CC
+            if (  !matchesPreference( 'Allow', 'MailCc', $thisCC )
+                || matchesPreference( 'Deny', 'MailCc', $thisCC ) )
+            {
+                $errorMessage = $ERROR_NO_PERMISSION_CC;
+                $errorMessage =~ s/\$EMAIL/$thisCC/go;
+                Foswiki::Func::writeWarning($errorMessage);
+                return finishSendEmail( $session, $ERROR_STATUS{'error'},
+                    $errorMessage );
+            }
+
+            push @ccEmails, $addrs;
         }
-
-        # validate CC
-        if (!matchesPreference('ALLOW', 'MAILCC', $thisCC) || 
-             matchesPreference('DENY', 'MAILCC', $thisCC)) {
-          $errorMessage = $ERROR_NO_CC_PERMISSION;
-          $errorMessage =~ s/\$EMAIL/$thisCC/go;
-          Foswiki::Func::writeWarning($errorMessage);
-          return finishSendEmail( $session, $ERROR_STATUS{'error'},
-            $errorMessage);
-        }
-
-        push @ccEmails, $addrs;
-      }
-      $cc = join(', ', @ccEmails);
-      writeDebug("cc=$cc");
+        $cc = join( ', ', @ccEmails );
+        writeDebug("cc=$cc");
     }
 
     # get SUBJECT
@@ -229,7 +273,7 @@ sub sendEmail {
     my $templateName = $query->param('template') || 'sendemail';
     my $template = Foswiki::Func::readTemplate($templateName);
     unless ($template) {
-      $template = <<'HERE';
+        $template = <<'HERE';
 From: %FROM%
 To: %TO%
 CC: %CC%
@@ -258,7 +302,7 @@ HERE
 
     writeDebug("errorStatus=$errorStatus");
     my $redirectUrl = $query->param('redirectto');
-    finishSendEmail( $session, $errorStatus, $errorMessage, $redirectUrl);
+    finishSendEmail( $session, $errorStatus, $errorMessage, $redirectUrl );
 }
 
 =pod
@@ -270,24 +314,25 @@ at least one of the patterns in the list matches.
 =cut
 
 sub matchesPreference {
-  my ($mode, $key, $value) = @_;
+    my ( $mode, $key, $value ) = @_;
 
-  writeDebug("called matchesPreference($mode, $key, $value)");
-  my $pattern;
+    my $pluginName = $Foswiki::Plugins::SendEmailPlugin::pluginName;
+    my $pattern = $Foswiki::cfg{Plugins}{$pluginName}{Permissions}{$mode}{$key};
 
-  $pattern = Foswiki::Func::getPreferencesValue(uc($mode.$key));
-  $pattern = Foswiki::Func::getPreferencesValue(uc('SendEmailPlugin_'.$mode.$key))
-    unless defined $pattern;
+    writeDebug("called matchesPreference($mode, $key, $value)");
+    writeDebug("matching pattern=$pattern");
+    writeDebug( "mode=" . ( $mode =~ /Allow/i ? 1 : 0 ) );
 
-  return ($mode =~ /ALLOW/i?1:0) unless $pattern;
+    return ( $mode =~ /Allow/i ? 1 : 0 ) unless $pattern;
 
-  $pattern =~ s/^\s//o;
-  $pattern =~ s/\s$//o;
-  $pattern = '('.join(')|(', split(/\s*,\s*/, $pattern)).')';
+    $pattern =~ s/^\s//o;
+    $pattern =~ s/\s$//o;
+    $pattern = '(' . join( ')|(', split( /\s*,\s*/, $pattern ) ) . ')';
 
-  writeDebug("pattern=$pattern");
+    writeDebug("final matching pattern=$pattern");
+    writeDebug( "match result:" . ( $value =~ /$pattern/ ) );
 
-  return ($value =~ /$pattern/)?1:0;
+    return ( $value =~ /$pattern/ ) ? 1 : 0;
 }
 
 =pod
@@ -312,20 +357,15 @@ sub handleSendEmailTag {
 
     my $feedbackSuccess = $params->{'feedbackSuccess'};
 
-    unless (defined $feedbackSuccess) {
-      $feedbackSuccess =
-        Foswiki::Func::getPreferencesValue(
-          "SENDEMAILPLUGIN_EMAIL_SENT_SUCCESS_MESSAGE")
-        || '';
+    unless ( defined $feedbackSuccess ) {
+        $feedbackSuccess = $EMAIL_SENT_SUCCESS_MESSAGE
+          || '';
     }
     $feedbackSuccess =~ s/^\s*(.*?)\s*$/$1/go;    # remove surrounding spaces
 
     my $feedbackError = $params->{'feedbackError'};
-    unless (defined $feedbackError) {
-      $feedbackError =
-        Foswiki::Func::getPreferencesValue(
-          "SENDEMAILPLUGIN_EMAIL_SENT_ERROR_MESSAGE")
-        || '';
+    unless ( defined $feedbackError ) {
+        $feedbackError = $EMAIL_SENT_ERROR_MESSAGE || '';
     }
 
     my $userMessage =
@@ -361,18 +401,20 @@ sub finishSendEmail {
     $query->param( -name => $ERROR_MESSAGE_TAG, -value => $errorMessage )
       if $query;
 
-    my $web   = $session->{webName};
-    my $topic = $session->{topicName};
-    my $origUrl = Foswiki::Func::getScriptUrl($web, $topic, 'view');
+    my $web     = $session->{webName};
+    my $topic   = $session->{topicName};
+    my $origUrl = Foswiki::Func::getScriptUrl( $web, $topic, 'view' );
 
-    $query->param( -name => 'origurl', -value => $origUrl);
+    $query->param( -name => 'origurl', -value => $origUrl );
 
-    my $section = $query->param(
-      ($errorStatus == $ERROR_STATUS{'error'})?'errorsection':'successsection');
+    my $section =
+      $query->param( ( $errorStatus == $ERROR_STATUS{'error'} )
+        ? 'errorsection'
+        : 'successsection' );
 
-    $query->param( -name => 'section', -value => $section) 
+    $query->param( -name => 'section', -value => $section )
       if $section;
-      
+
     $redirectUrl ||= $origUrl;
     Foswiki::Func::redirectCgiQuery( undef, $redirectUrl, 1 );
 
@@ -407,13 +449,15 @@ sub wrapHtmlNotificationContainer {
 
     my $message = $text;
 
-    if ( $errorMessage ) {
-      if ( length $errorMessage < 256 ) {
-          $message .= ' '.$errorMessage;
-      } else {
-          my $oopsUrl = Foswiki::Func::getOopsUrl( $web, $topic, 'oopsgeneric' );
-          $errorMessage = '<verbatim>' . $errorMessage . '</verbatim>';
-          my $errorForm = <<'HERE';
+    if ($errorMessage) {
+        if ( length $errorMessage < 256 ) {
+            $message .= ' ' . $errorMessage;
+        }
+        else {
+            my $oopsUrl =
+              Foswiki::Func::getOopsUrl( $web, $topic, 'oopsgeneric' );
+            $errorMessage = '<verbatim>' . $errorMessage . '</verbatim>';
+            my $errorForm = <<'HERE';
 <form enctype="application/x-www-form-urlencoded" name="mailerrorfeedbackform" action="%OOPSURL%" method="POST">
 <input type="hidden" name="template" value="oopsgeneric" />
 <input type="hidden" name="param1" value="%ERRORTITLE%" />
@@ -423,20 +467,20 @@ sub wrapHtmlNotificationContainer {
 <input type="submit" class="foswikiButton" value="%ERRORBUTTON%"  />
 </form>
 HERE
-          $errorForm =~ s/%OOPSURL%/$oopsUrl/go;
-          $errorForm =~ s/%ERRORTITLE%/$ERROR_TITLE/go;
-          $errorForm =~ s/%ERRORMESSAGE%/$errorMessage/go;
-          $errorForm =~ s/%ERRORBUTTON%/$ERROR_BUTTON_LABEL/go;
-          $message .= ' ' . $errorForm;
-      }
+            $errorForm =~ s/%OOPSURL%/$oopsUrl/go;
+            $errorForm =~ s/%ERRORTITLE%/ $ERROR_TITLE /go;
+            $errorForm =~ s/%ERRORMESSAGE%/$errorMessage/go;
+            $errorForm =~ s/%ERRORBUTTON%/$ERROR_BUTTON_LABEL/go;
+            $message .= ' ' . $errorForm;
+        }
     }
 
-    return "#$NOTIFICATION_ANCHOR_NAME\n"
+    return
+        "#$NOTIFICATION_ANCHOR_NAME\n"
       . '<div class="'
       . $cssClass . '">'
       . $message
       . '</div>';
 }
-
 
 1;

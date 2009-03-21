@@ -19,30 +19,28 @@ package Foswiki::Plugins::SendEmailPlugin;
 use strict;
 use Foswiki::Func;
 
-use vars qw( $VERSION $RELEASE );
-
-$VERSION = '$Rev: 11069$';
-$RELEASE = '1.3';
+our $VERSION    = '$Rev: 11069$';
+our $RELEASE    = '1.4';
+our $pluginName = 'SendEmailPlugin';
 
 sub initPlugin {
 
-  # check for Plugins.pm versions
-  if ( $Foswiki::Plugins::VERSION < 1.026 ) {
-    Foswiki::Func::writeWarning(
-      "Version mismatch between SendEmailPlugin and Plugins.pm");
-      return 0;
-  }
+    # check for Plugins.pm versions
+    if ( $Foswiki::Plugins::VERSION < 1.026 ) {
+        Foswiki::Func::writeWarning(
+            "Version mismatch between SendEmailPlugin and Plugins.pm");
+        return 0;
+    }
 
-  Foswiki::Func::registerTagHandler( 'SENDEMAIL', \&handleSendEmailTag );
+    Foswiki::Func::registerTagHandler( 'SENDEMAIL', \&handleSendEmailTag );
 
-  # Plugin correctly initialized
-  return 1;
+    # Plugin correctly initialized
+    return 1;
 }
 
 sub handleSendEmailTag {
-  require Foswiki::Plugins::SendEmailPlugin::Core;
-  Foswiki::Plugins::SendEmailPlugin::Core::handleSendEmailTag(@_);
+    require Foswiki::Plugins::SendEmailPlugin::Core;
+    Foswiki::Plugins::SendEmailPlugin::Core::handleSendEmailTag(@_);
 }
-
 
 1;

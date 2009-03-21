@@ -53,6 +53,7 @@ Subject: %SUBJECT%
      in which case the email address of that wiki user is used instead.
 
 ---++ Example
+---+++ Example with plain html
 %TWISTY{showlink=" Show code" hidelink=" Hide code" showimgleft="%ICONURLPATH{toggleopen}%" hideimgleft="%ICONURLPATH{toggleclose}%" mode="div"}%
 <verbatim>
 <form enctype="application/x-www-form-urlencoded" name="mailform" action="%SCRIPTURL{sendemail}%/%WEB%/%TOPIC%" method="POST">
@@ -328,21 +329,8 @@ Summary: %FORMFIELD{"Summary"}%
    * One line description, is shown in the %SYSTEMWEB%.TextFormattingRules topic:
       * Set SHORTDESCRIPTION = Allows to send e-mail through an e-mail form
 
-   * Default feedback messages:
-      * Set EMAIL_SENT_SUCCESS_MESSAGE = Email sent!
-      * Set EMAIL_SENT_ERROR_MESSAGE = Could not send email.
-
-   * Default mail permissions, (note: by default any emailing is prohibited)
-      * Set ALLOWMAILTO = 
-      * Set DENYMAILTO = .*
-      * Set ALLOWMAILFROM = 
-      * Set DENYMAILFROM = .*
-      * Set ALLOWMAILCC = 
-      * Set DENYMAILCC = .*
-
-   * Debug plugin: (See output in =data/debug.txt=)
-      * Set DEBUG = 0
-
+   * Other plugin settings are set in [[%SCRIPTURLPATH{configure}%][configure]] - look for ={SendEmailPlugin}= settings.
+   * Note: by default any emailing is prohibited. Change the settings in configure to set to which addresses you allow mails to be sent from and to.
 
 ---++ CSS classes
 
@@ -367,11 +355,12 @@ plugin on the server where Foswiki is running.
 
 ---++ Plugin Info
 
-|  Plugin Author: | TWiki:Main.ArthurClemens |
-|  Copyright: | &copy; 2007 Arthur Clemens; 2008 Michael Daum |
+|  Plugin Author: | Foswiki:Main.ArthurClemens |
+|  Copyright: | &copy; 2007-2009 Arthur Clemens; 2008 Michael Daum |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
-|  Plugin Version: | 1.3 (12 Mar 2009)  |
+|  Plugin Version: | 1.4 (21 Mar 2009)  |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  21 Mar 2009 | 1.4 Arthur Clemens: moved topic and hardcoded settings to configure. | 
 |  12 Mar 2009 | 1.3 Foswiki version. |
 |  06 Nov 2008 | 1.2.3 Michael Daum: fixed CC emails; fixed css in docu |
 |  17 Oct 2008 | 1.2.1 Michael Daum: added support for TWiki-5; fixed sending emails to login names |
@@ -384,14 +373,16 @@ plugin on the server where Foswiki is running.
                  allow multiple users in To and Cc; \
                  added a =redirectto=, =successsection= and =errorsection= options to land on a different feedback page; \
                  reorganized code for lazy compilation |
-|  16 may 2007 | 1.1.3 TWiki:Main/ArthurClemens: fixed bug in bin script that caused form query data to get emptied. |
-|  15 may 2007 | 1.1.2 TWiki:Main/ArthurClemens: improved error notifications. |
-|  13 May 2007 | 1.1.1 TWiki:Main/ArthurClemens: changed sendmail script invocation to be called through bin script =sendemail=; added CSS styles for feedback notification; fixed typo 'feedbackSucces'. |
+|  16 may 2007 | 1.1.3 Foswiki:Main/ArthurClemens: fixed bug in bin script that caused form query data to get emptied. |
+|  15 may 2007 | 1.1.2 Foswiki:Main/ArthurClemens: improved error notifications. |
+|  13 May 2007 | 1.1.1 Foswiki:Main/ArthurClemens: changed sendmail script invocation to be called through bin script =sendemail=; added CSS styles for feedback notification; fixed typo 'feedbackSucces'. |
 |  05 May 2007 | 1.0 First release. |
-|  TWiki Dependency: | $TWiki::Plugins::VERSION 1.1 |
+|  Foswiki Dependency: | %DEPENDENCIES% |
 |  CPAN Dependencies: | none |
 |  Other Dependencies: | none |
 |  Perl Version: | 5.005 |
 |  Plugin Home: | http://foswiki.org/Extensions/%TOPIC% |
 |  Support: | http://foswiki.org/Support/%TOPIC% |
+|  Development: | http://foswiki.org/Development/%TOPIC% |
+
 
