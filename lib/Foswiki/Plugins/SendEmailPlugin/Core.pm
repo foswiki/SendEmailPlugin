@@ -323,16 +323,22 @@ sub matchesPreference {
     writeDebug("matching pattern=$pattern");
     writeDebug( "mode=" . ( $mode =~ /Allow/i ? 1 : 0 ) );
 
-    return ( $mode =~ /Allow/i ? 1 : 0 ) unless $pattern;
+	if ($mode =~ /Deny/i && !$pattern) {
+	    # no pattern, so noone is denied
+	    return 0;
+	}
 
     $pattern =~ s/^\s//o;
     $pattern =~ s/\s$//o;
     $pattern = '(' . join( ')|(', split( /\s*,\s*/, $pattern ) ) . ')';
 
     writeDebug("final matching pattern=$pattern");
-    writeDebug( "match result:" . ( $value =~ /$pattern/ ) );
 
-    return ( $value =~ /$pattern/ ) ? 1 : 0;
+    my $result = ( $value =~ /$pattern/ ) ? 1 : 0;
+    
+    writeDebug( "result=$result");
+
+    return $result;
 }
 
 =pod

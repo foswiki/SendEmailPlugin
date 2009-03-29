@@ -20,8 +20,9 @@ use strict;
 use Foswiki::Func;
 
 our $VERSION    = '$Rev: 11069$';
-our $RELEASE    = '1.4';
+our $RELEASE    = '1.4.1';
 our $pluginName = 'SendEmailPlugin';
+our $NO_PREFS_IN_TOPIC = 1;
 
 sub initPlugin {
 

@@ -9,7 +9,7 @@ $Foswiki::cfg{Plugins}{SendEmailPlugin}{Permissions}{Allow}{MailTo} = '';
 #
 # **STRING 300**
 # Regular expression of mail addresses that we want to deny to send to. To send to multiple addresses you can write (address1|address2). To deny everyone use '.*'.
-$Foswiki::cfg{Plugins}{SendEmailPlugin}{Permissions}{Deny}{MailTo} = '.*';
+$Foswiki::cfg{Plugins}{SendEmailPlugin}{Permissions}{Deny}{MailTo} = '';
 #
 # **STRING 300**
 # Regular expression of mail addresses that we are allowed to send from. To send to multiple addresses you can write (address1|address2).
@@ -17,7 +17,7 @@ $Foswiki::cfg{Plugins}{SendEmailPlugin}{Permissions}{Allow}{MailFrom} = '';
 #
 # **STRING 300**
 # Regular expression of mail addresses that we want to deny to send from. To send to multiple addresses you can write (address1|address2). To deny everyone use '.*'.
-$Foswiki::cfg{Plugins}{SendEmailPlugin}{Permissions}{Deny}{MailFrom} = '.*';
+$Foswiki::cfg{Plugins}{SendEmailPlugin}{Permissions}{Deny}{MailFrom} = '';
 #
 # **STRING 300**
 # Regular expression of mail addresses that we are allowed to send to by cc. To send to multiple addresses you can write (address1|address2).
@@ -25,7 +25,7 @@ $Foswiki::cfg{Plugins}{SendEmailPlugin}{Permissions}{Allow}{MailCc} = '';
 #
 # **STRING 300**
 # Regular expression of mail addresses that we want to deny to send to by cc. To send to multiple addresses you can write (address1|address2). To deny everyone use '.*'.
-$Foswiki::cfg{Plugins}{SendEmailPlugin}{Permissions}{Deny}{MailCc} = '.*';
+$Foswiki::cfg{Plugins}{SendEmailPlugin}{Permissions}{Deny}{MailCc} = '';
 #
 # **STRING 300**
 # Localized error message (English)

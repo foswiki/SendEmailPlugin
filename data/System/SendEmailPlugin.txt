@@ -15,7 +15,7 @@
       * The =from= field may be used but defaults to the address of the current user.
    * To show feedback write =%<nop>SENDEMAIL%= anywhere on the page where the feedback should appear.
       * Optionally pass parameters =feedbackSuccess= and =feedbackError=. 
-        Default feedback messages are set below in [[#PluginSettings][Plugin Settings]].
+        Default feedback messages are set below in [[%SCRIPTURLPATH{configure}%][configure]].
    * The =redirectto= is an url to redirect to a different landing page after the mail has been sent.
    * The =successsection= parameter optionally sets the named section to be extracted.
    * The =errorsection= parameter specifies the named section to be extracted when an error occured.
@@ -27,32 +27,42 @@ To: %TO%
 CC: %CC%
 Subject: %SUBJECT%
 
-%BODY%</verbatim>
-      The tags =%<nop>FROM%=, =%<nop>TO%=, =%<nop>CC%=, =%<nop>SUBJECT%= and =%<nop>BODY%= are replaced
-      with the respective url parameter when the email is created.
-   * The value of the recipient's and sender's email address can be restricted using the
-     preference variables: 
-     =ALLOWMAILTO=,
-     =DENYMAILTO=,
-     =ALLOWMAILFROM=,
-     =DENYMAILFROM=,
-     =ALLOWMAILCC= and 
-     =DENYMAILCC=. 
-     Each can be a list of comma separated regular expressions that emails are checked against before
-     allowing the mail to be send. This is needed to prevent this plugin from being used as an open email relay
-     and potentially being missused to create spam emails. By default, this plugin will prohibit any email to be send.
-     You will have to change the settings [[#PluginSettings][below]] to match your needs. Preferably,
-     keep the settings as they are as a security measure and enable sending emails on a per-form basis
-     by setting the respective topic preferences in the topic holding the send-email form. For example, to
-     allow the email form on the current topic to be send to the <nop>support, use the following settings
-     <verbatim>
-* Set ALLOWMAILTO = support
-* Set DENYMAILTO =
-* Set DENYMAILFROM = </verbatim>
-   * Note, that the =From=, =To= and =CC= parameters can be either an email address or a wiki user name,
-     in which case the email address of that wiki user is used instead.
+%BODY%
+</verbatim>
+  The tags =%<nop>FROM%=, =%<nop>TO%=, =%<nop>CC%=, =%<nop>SUBJECT%= and =%<nop>BODY%= are replaced with the respective url parameter when the email is created.
 
----++ Example
+Note, that the =From=, =To= and =CC= parameters can be either an email address or a wiki user name, in which case the email address of that wiki user is used instead.
+
+---+++ Restricting sending emails
+To prevent this plugin to be used as open email relay, by default sending emails is prohibited. To send out mails, first set the mail addresses you want to allow to send to in [[%SCRIPTURLPATH{configure}%][configure]].
+
+These preferences can be set:
+   * ={Plugins}{SendEmailPlugin}{Permissions}{Allow}{MailTo}=
+   * ={Plugins}{SendEmailPlugin}{Permissions}{Deny}{MailTo}=
+   * ={Plugins}{SendEmailPlugin}{Permissions}{Allow}{MailFrom}=
+   * ={Plugins}{SendEmailPlugin}{Permissions}{Deny}{MailFrom}=
+   * ={Plugins}{SendEmailPlugin}{Permissions}{Allow}{MailCc}=
+   * ={Plugins}{SendEmailPlugin}{Permissions}{Deny}{MailCc}=
+   
+Each can be a list of comma separated regular expressions that emails are checked against before allowing the mail to be sent.
+
+Each =Deny= is evaluated after each =Allow=, so Deny settings overrule Allow settings.
+
+---++++ Examples
+   * Allow to send to:
+      * Set ={SendEmailPlugin}{Permissions}{Allow}{MailTo}= to:
+         * =john@tar.com= to only allow to send mails to John
+         * =john@tar.com|mary@look.ca= to allow to send mails to John and Mary
+         * =.*@tar.com= to send mails to any address at @tar.com
+         * =.*@tar.com,mary@.*= to send mails to any address at @tar.com and to all Marys in the world
+   * Deny to send to:
+      * Set ={SendEmailPlugin}{Permissions}{Deny}{MailTo}= to:
+         * =.*@tar.com= to deny to any address at @tar.com
+         * =.*= to deny any address (no emails will be sent)
+
+The same rules apply for =MailFrom= and =MailCc=.
+
+---++ Examples
 ---+++ Example with plain html
 %TWISTY{showlink=" Show code" hidelink=" Hide code" showimgleft="%ICONURLPATH{toggleopen}%" hideimgleft="%ICONURLPATH{toggleclose}%" mode="div"}%
 <verbatim>
@@ -134,7 +144,7 @@ Subject: %SUBJECT%
 
 <!--
 %STARTSECTION{"thanks"}%
----+ Notification
+---+!! Notification
 %SENDEMAIL%
 <input type="button" value="Ok" class="foswikiButton" onclick="window.location.href='%URLPARAM{"origurl" default="%SCRIPTURLPATH{view}%/%BASEWEB%/%BASETOPIC%"}%'" />
 %ENDSECTION{"thanks"}%
@@ -318,6 +328,7 @@ Summary: %FORMFIELD{"Summary"}%
 </textarea>
 </verbatim>
 
+
 #PluginTest
 ---++ Plugin Tests
    * !SendEmailPlugin is %IF{"context SendEmailPluginEnabled" then='%GREEN%enabled%ENDCOLOR%' else='%RED%not enabled%ENDCOLOR%'}%.
@@ -350,16 +361,15 @@ plugin on the server where Foswiki is running.
    * Unzip ==%TOPIC%.zip== in your Foswiki installation directory. Content:
      | *File:* | *Description:* |
 %$MANIFEST%
-   * Add the following lines to your =LocalSite.cfg=:
-     <verbatim>$Foswiki::cfg{SwitchBoard}{sendemail} = ['Foswiki::Plugins::SendEmailPlugin::Core', 'sendEmail', {sendemail => 1}];</verbatim>
 
 ---++ Plugin Info
 
 |  Plugin Author: | Foswiki:Main.ArthurClemens |
 |  Copyright: | &copy; 2007-2009 Arthur Clemens; 2008 Michael Daum |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
-|  Plugin Version: | 1.4 (21 Mar 2009)  |
+|  Plugin Version: | 1.4.1 (29 Mar 2009)  |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  29 Mar 2009 | 1.4.1 Arthur Clemens: removed default restrictions in =Deny= settings so that only the =Allow= setting needs to be set to send emails. |
 |  21 Mar 2009 | 1.4 Arthur Clemens: moved topic and hardcoded settings to configure. | 
 |  12 Mar 2009 | 1.3 Foswiki version. |
 |  06 Nov 2008 | 1.2.3 Michael Daum: fixed CC emails; fixed css in docu |
