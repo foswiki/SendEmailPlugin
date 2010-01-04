@@ -63,7 +63,7 @@ Each =Deny= is evaluated after each =Allow=, so Deny settings overrule Allow set
 The same rules apply for =MailFrom= and =MailCc=.
 
 ---++ Examples
----+++ Example with plain html
+---+++ Example with a handcrafted HTML form
 %TWISTY{showlink=" Show code" hidelink=" Hide code" showimgleft="%ICONURLPATH{toggleopen}%" hideimgleft="%ICONURLPATH{toggleclose}%" mode="div"}%
 <verbatim>
 <form enctype="application/x-www-form-urlencoded" name="mailform" action="%SCRIPTURL{sendemail}%/%WEB%/%TOPIC%" method="POST">
@@ -105,7 +105,6 @@ The same rules apply for =MailFrom= and =MailCc=.
 </verbatim>
 %ENDTWISTY%
 
-
 <form enctype="application/x-www-form-urlencoded" name="mailform" action="%SCRIPTURL{sendemail}%/%WEB%/%TOPIC%" method="POST">
 <input type="hidden" name="successsection" value="thanks" />
 <fieldset>
@@ -135,12 +134,13 @@ The same rules apply for =MailFrom= and =MailCc=.
 </form>
 %SENDEMAIL%
 
-<style type="text/css">
+%ADDTOHEAD{text="<style type=\"text/css\">
 #patternPage fieldset {
   border:1px solid #ddd;
   padding:1em
 }
 </style>
+"}%
 
 <!--
 %STARTSECTION{"thanks"}%
@@ -350,25 +350,18 @@ Summary: %FORMFIELD{"Summary"}%
 | =sendEmailPluginError=         | Styles =sendEmailPluginNotification= in case of an error   |
 
 
-
 ---++ Plugin Installation Instructions
-
-__Note:__ You do not need to install anything on the browser to use this
-plugin. The following instructions are for the administrator who installs the
-plugin on the server where Foswiki is running. 
-
-   * Download the ZIP file from the Plugin web (see below)
-   * Unzip ==%TOPIC%.zip== in your Foswiki installation directory. Content:
-     | *File:* | *Description:* |
-%$MANIFEST%
+%$INSTALL_INSTRUCTIONS%
 
 ---++ Plugin Info
 
 |  Plugin Author: | Foswiki:Main.ArthurClemens |
-|  Copyright: | &copy; 2007-2009 Arthur Clemens; 2008 Michael Daum |
+|  Copyright: | &copy; 2007-2010 Arthur Clemens; 2008 Michael Daum |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
-|  Plugin Version: | 1.4.1 (29 Mar 2009)  |
+|  Version: | %$VERSION% |
+|  Release: | %$RELEASE% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  03 Jan 2010 | 1.4.2 Add configure settings to download. |
 |  29 Mar 2009 | 1.4.1 Arthur Clemens: removed default restrictions in =Deny= settings so that only the =Allow= setting needs to be set to send emails. |
 |  21 Mar 2009 | 1.4 Arthur Clemens: moved topic and hardcoded settings to configure. | 
 |  12 Mar 2009 | 1.3 Foswiki version. |

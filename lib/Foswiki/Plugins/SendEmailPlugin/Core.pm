@@ -1,6 +1,6 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (c) 2007-2009 by Arthur Clemens, Michael Daum
+# Copyright (c) 2007-2010 by Arthur Clemens, Michael Daum
 #
 # and Foswiki Contributors. All Rights Reserved. Foswiki Contributors
 # are listed in the AUTHORS file in the root of this distribution.
@@ -22,6 +22,7 @@ package Foswiki::Plugins::SendEmailPlugin::Core;
 
 # Always use strict to enforce variable scoping
 use strict;
+use Foswiki;
 use Foswiki::Func;
 use Foswiki::Plugins;
 
@@ -69,7 +70,10 @@ sub init {
     my $session = shift;
     $Foswiki::Plugins::SESSION ||= $session;
     my $pluginName = $Foswiki::Plugins::SendEmailPlugin::pluginName;
-    $debug = $Foswiki::cfg{Plugins}{$pluginName}{Debug} || 0;
+    $debug =
+         Foswiki::Func::getPreferencesFlag('SENDEMAILPLUGIN_DEBUG')
+      || $Foswiki::cfg{Plugins}{$pluginName}{Debug}
+      || 0;
     $emailRE = Foswiki::Func::getRegularExpression('emailAddrRegex');
     initMessageStrings();
 }
@@ -323,10 +327,11 @@ sub matchesPreference {
     writeDebug("matching pattern=$pattern");
     writeDebug( "mode=" . ( $mode =~ /Allow/i ? 1 : 0 ) );
 
-	if ($mode =~ /Deny/i && !$pattern) {
-	    # no pattern, so noone is denied
-	    return 0;
-	}
+    if ( $mode =~ /Deny/i && !$pattern ) {
+
+        # no pattern, so noone is denied
+        return 0;
+    }
 
     $pattern =~ s/^\s//o;
     $pattern =~ s/\s$//o;
@@ -335,8 +340,8 @@ sub matchesPreference {
     writeDebug("final matching pattern=$pattern");
 
     my $result = ( $value =~ /$pattern/ ) ? 1 : 0;
-    
-    writeDebug( "result=$result");
+
+    writeDebug("result=$result");
 
     return $result;
 }
@@ -378,8 +383,18 @@ sub handleSendEmailTag {
       ( $errorStatus == $ERROR_STATUS{'error'} )
       ? $feedbackError
       : $feedbackSuccess;
-    $userMessage =~ s/^\s*(.*?)\s*$/$1/go;        # remove surrounding spaces
+      
+    $userMessage =~ s/^[[:space:]]+//s;    # trim at start
+    $userMessage =~ s/[[:space:]]+$//s;    # trim at end
+    
     my $errorMessage = $query->param($ERROR_MESSAGE_TAG) || '';
+    
+    #$errorMessage = Foswiki::entityEncode($errorMessage);
+    # TODO: change newlines to <br />
+    
+    writeDebug("userMessage=$userMessage");
+    writeDebug("errorStatus=$errorStatus");
+    writeDebug("errorMessage=$errorMessage");
 
     return wrapHtmlNotificationContainer( $userMessage, $errorStatus,
         $errorMessage, $topic, $web );
@@ -413,10 +428,11 @@ sub finishSendEmail {
 
     $query->param( -name => 'origurl', -value => $origUrl );
 
-    my $section =
-      $query->param( ( $errorStatus == $ERROR_STATUS{'error'} )
+    my $section = $query->param(
+        ( $errorStatus == $ERROR_STATUS{'error'} )
         ? 'errorsection'
-        : 'successsection' );
+        : 'successsection'
+    );
 
     $query->param( -name => 'section', -value => $section )
       if $section;
@@ -462,7 +478,7 @@ sub wrapHtmlNotificationContainer {
         else {
             my $oopsUrl =
               Foswiki::Func::getOopsUrl( $web, $topic, 'oopsgeneric' );
-            $errorMessage = '<verbatim>' . $errorMessage . '</verbatim>';
+
             my $errorForm = <<'HERE';
 <form enctype="application/x-www-form-urlencoded" name="mailerrorfeedbackform" action="%OOPSURL%" method="POST">
 <input type="hidden" name="template" value="oopsgeneric" />
@@ -478,6 +494,7 @@ HERE
             $errorForm =~ s/%ERRORMESSAGE%/$errorMessage/go;
             $errorForm =~ s/%ERRORBUTTON%/$ERROR_BUTTON_LABEL/go;
             $message .= ' ' . $errorForm;
+            writeDebug("message=$message");
         }
     }
 

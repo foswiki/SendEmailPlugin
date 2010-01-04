@@ -1,4 +1,5 @@
-#---+ SendEmailPlugin
+#---+ Extensions
+#---++ SendEmailPlugin
 # **BOOLEAN**
 # Enable debugging (debug messages will be written to data/debug.txt)
 $Foswiki::cfg{Plugins}{SendEmailPlugin}{Debug} = '0';
