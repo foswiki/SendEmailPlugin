@@ -29,14 +29,6 @@ $Foswiki::cfg{Plugins}{SendEmailPlugin}{Permissions}{Allow}{MailCc} = '';
 $Foswiki::cfg{Plugins}{SendEmailPlugin}{Permissions}{Deny}{MailCc} = '';
 #
 # **STRING 300**
-# Localized error message (English)
-$Foswiki::cfg{Plugins}{SendEmailPlugin}{Messages}{SendError}{en} = '[[%SYSTEMWEB%.SendEmailPlugin]] send error';
-#
-# **STRING 300**
-# Localized button label (English)
-$Foswiki::cfg{Plugins}{SendEmailPlugin}{Messages}{ButtonLabel}{en} = 'Show error message';
-#
-# **STRING 300**
 # Localized message mail sent successfully (English)
 $Foswiki::cfg{Plugins}{SendEmailPlugin}{Messages}{SentSuccess}{en} = 'Email sent!';
 #
