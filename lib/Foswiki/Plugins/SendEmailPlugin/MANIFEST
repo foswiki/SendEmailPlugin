@@ -3,5 +3,6 @@ data/System/SendEmailPlugin.txt 0644 Documentation
 data/System/SendEmailPluginTemplate.txt 0644 Default email template
 lib/Foswiki/Plugins/SendEmailPlugin.pm 0644 Plugin stub
 lib/Foswiki/Plugins/SendEmailPlugin/Core.pm 0644 Plugin core
+lib/Foswiki/Plugins/SendEmailPlugin/Config.spec 0664 Configure settings
 pub/System/SendEmailPlugin/sendemailplugin.css 0777 CSS styles
 pub/System/SendEmailPlugin/screenshot.png 0777

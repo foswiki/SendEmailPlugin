@@ -430,6 +430,7 @@ HTML elements with these style names are written to the default feedback.
 |  Version: | %$VERSION% |
 |  Release: | %$RELEASE% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  28 Feb 2010 | 1.5.1 Added forgotten =Config.spec= file. |
 |  08 Jan 2010 | 1.5 Arthur Clemens: Improved error feedback; added =format= parameter; moved the mail template to a topic; changed param =template= to =mailtemplate=. |
 |  03 Jan 2010 | 1.4.2 Arthur Clemens: Added configure settings to download. |
 |  29 Mar 2009 | 1.4.1 Arthur Clemens: Removed default restrictions in =Deny= settings so that only the =Allow= setting needs to be set to send emails. |
