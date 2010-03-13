@@ -38,6 +38,10 @@ my %ERROR_STATUS                 = (
     'noerror' => 1,
     'error'   => 2,
 );
+my %ERROR_STATUS_MESSAGE                 = (
+    1 => 'success',
+    2 => 'error',
+);
 my $EMAIL_SENT_SUCCESS_MESSAGE;
 my $EMAIL_SENT_ERROR_MESSAGE;
 my $ERROR_INVALID_ADDRESS;
@@ -311,6 +315,61 @@ HERE
 
 =pod
 
+Renders the SENDEMAIL feedback macro.
+
+=cut
+
+sub handleSendEmailTag {
+    my ( $session, $params, $topic, $web ) = @_;
+
+    init();
+    _addHeader();
+
+    my $query = Foswiki::Func::getCgiQuery();
+    return '' if !$query;
+
+    my $errorStatus = $query->param($ERROR_STATUS_TAG);
+    my $errorMessage = $query->param($ERROR_MESSAGE_TAG) || '';
+
+    my $feedbackSuccess = $params->{'feedbackSuccess'};
+    my $feedbackError   = $params->{'feedbackError'};
+    my $format          = $params->{'format'};
+
+    return '' if !defined $errorStatus;
+
+    _debug("handleSendEmailTag errorStatus=" . _errorStatusMessage($errorStatus));
+    
+    unless ( defined $feedbackSuccess ) {
+        $feedbackSuccess = $EMAIL_SENT_SUCCESS_MESSAGE
+          || '';
+    }
+    $feedbackSuccess =~ s/^\s*(.*?)\s*$/$1/go;    # remove surrounding spaces
+
+    unless ( defined $feedbackError ) {
+        $feedbackError = $EMAIL_SENT_ERROR_MESSAGE || '';
+    }
+
+    my $userMessage =
+      ( $errorStatus == $ERROR_STATUS{'error'} )
+      ? $feedbackError
+      : $feedbackSuccess;
+
+    $userMessage =~ s/^[[:space:]]+//s;           # trim at start
+    $userMessage =~ s/[[:space:]]+$//s;           # trim at end
+
+    my $notificationMessage =
+      _createNotificationMessage( $userMessage, $errorStatus, $errorMessage,
+        defined $format );
+
+    if ($format) {
+        $format =~ s/\$message/$notificationMessage/;
+        $notificationMessage = $format;
+    }
+    return _wrapHtmlNotificationContainer($notificationMessage);
+}
+
+=pod
+
 Checks if a given value matches a preferences pattern. The pref pattern
 actually is a list of patterns. The function returns true if 
 at least one of the patterns in the list matches.
@@ -350,68 +409,14 @@ sub _matchesSetting {
 
 =cut
 
-sub handleSendEmailTag {
-    my ( $session, $params, $topic, $web ) = @_;
-
-    init();
-    _addHeader();
-
-    my $query = Foswiki::Func::getCgiQuery();
-    return '' if !$query;
-
-    my $errorStatus = $query->param($ERROR_STATUS_TAG);
-    my $errorMessage = $query->param($ERROR_MESSAGE_TAG) || '';
-
-    my $feedbackSuccess = $params->{'feedbackSuccess'};
-    my $feedbackError   = $params->{'feedbackError'};
-    my $format          = $params->{'format'};
-
-    _debug("handleSendEmailTag; errorStatus=$errorStatus")
-      if $errorStatus;
-
-    return '' if !defined $errorStatus;
-
-    unless ( defined $feedbackSuccess ) {
-        $feedbackSuccess = $EMAIL_SENT_SUCCESS_MESSAGE
-          || '';
-    }
-    $feedbackSuccess =~ s/^\s*(.*?)\s*$/$1/go;    # remove surrounding spaces
-
-    unless ( defined $feedbackError ) {
-        $feedbackError = $EMAIL_SENT_ERROR_MESSAGE || '';
-    }
-
-    my $userMessage =
-      ( $errorStatus == $ERROR_STATUS{'error'} )
-      ? $feedbackError
-      : $feedbackSuccess;
-
-    $userMessage =~ s/^[[:space:]]+//s;           # trim at start
-    $userMessage =~ s/[[:space:]]+$//s;           # trim at end
-
-    my $notificationMessage =
-      _createNotificationMessage( $userMessage, $errorStatus, $errorMessage,
-        defined $format );
-
-    if ($format) {
-        $format =~ s/\$message/$notificationMessage/;
-        $notificationMessage = $format;
-    }
-    return _wrapHtmlNotificationContainer($notificationMessage);
-}
-
-=pod
-
-=cut
-
 sub _finishSendEmail {
     my ( $session, $errorStatus, $errorMessage, $redirectUrl ) = @_;
 
     my $query = Foswiki::Func::getCgiQuery();
 
-    _debug("_finishSendEmail errorStatus=$errorStatus;")
+    _debug("_finishSendEmail errorStatus=" . _errorStatusMessage($errorStatus))
       if $errorStatus;
-    _debug("_finishSendEmail redirectUrl=$redirectUrl;")
+    _debug("_finishSendEmail redirectUrl=$redirectUrl")
       if $redirectUrl;
 
     $query->param( -name => $ERROR_STATUS_TAG, -value => $errorStatus )
@@ -487,6 +492,12 @@ sub _wrapHtmlNotificationContainer {
 
     return CGI::a( { name => $NOTIFICATION_ANCHOR_NAME }, '<!--#-->' ) . "\n"
       . $notificationMessage;
+}
+
+sub _errorStatusMessage {
+	my ($errorStatus) = @_;
+	
+	return $ERROR_STATUS_MESSAGE{$errorStatus};
 }
 
 1;

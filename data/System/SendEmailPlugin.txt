@@ -12,20 +12,21 @@
    1 Add a "to" field and a submit button
    1 Make sure to fill in allowed 'to' addresses in setting ={Permissions}{Allow}{MailTo}= in [[%SCRIPTURLPATH{configure}%#SendEmailPlugin$Extensions][configure]]
 
+---+++ Example
+<form enctype="application/x-www-form-urlencoded" name="mailform" action="%SCRIPTURL{sendemail}%/%WEB%/%TOPIC%" method="POST">
+<input type="hidden" name="subject" value="hello!" />
+Send to: <input class="foswikiInputField" name="to" size="30" type="text" value="email address..." />&nbsp;
+<input type="submit" class="foswikiSubmit" value="Send" />
+
 %TWISTY{showlink=" Show code" hidelink=" Hide code" showimgleft="%ICONURLPATH{toggleopen}%" hideimgleft="%ICONURLPATH{toggleclose}%" mode="div"}%
 <verbatim>
 <form enctype="application/x-www-form-urlencoded" name="mailform" action="%SCRIPTURL{sendemail}%/%WEB%/%TOPIC%" method="POST">
 <input type="hidden" name="subject" value="hello!" />
-<input type="text" class="foswikiInputField" name="to" size="30" />&nbsp;
+Send to: <input class="foswikiInputField" name="to" size="30" type="text" value="email address..." />&nbsp;
 <input type="submit" class="foswikiSubmit" value="Send" />
 </form>
 </verbatim>
 %ENDTWISTY%
-
-<form enctype="application/x-www-form-urlencoded" name="mailform" action="%SCRIPTURL{sendemail}%/%WEB%/%TOPIC%" method="POST">
-<input type="hidden" name="subject" value="hello!" />
-<input class="foswikiInputField" name="to" size="30" type="text" />&nbsp;
-<input type="submit" class="foswikiSubmit" value="Send" />
 
 ---++ Usage details
 
@@ -137,8 +138,7 @@ The search path for templates always starts in the current web.
 ---+++ Example with a handcrafted HTML form
 %TWISTY{showlink=" Show code" hidelink=" Hide code" showimgleft="%ICONURLPATH{toggleopen}%" hideimgleft="%ICONURLPATH{toggleclose}%" mode="div"}%
 <verbatim>
-<form enctype="application/x-www-form-urlencoded" name="mailform" action="%SCRIPTURL{sendemail}%/%WEB%/%TOPIC%" method="POST">
-<input type="hidden" name="successsection" value="thanks" />
+<form enctype="application/x-www-form-urlencoded" name="mailform1" action="%SCRIPTURL{sendemail}%/%WEB%/%TOPIC%" method="POST">
 <fieldset>
 <legend><b>Send Email</b></legend>
 <div class="foswikiFormSteps">
@@ -164,20 +164,15 @@ The search path for templates always starts in the current web.
 </div>
 </fieldset>
 </form>
-%SENDEMAIL%
-<!--
-%STARTSECTION{"thanks"}%
----+!! Notification
-%SENDEMAIL%
-<input type="button" value="Ok" class="foswikiButton" onclick="window.location.href='%URLPARAM{"origurl" default="%SCRIPTURLPATH{view}%/%BASEWEB%/%BASETOPIC%"}%'" />
-%ENDSECTION{"thanks"}%
-
--->
+%SENDEMAIL{
+feedbackSuccess="Request sent, we'll contact you shortly."
+feedbackError="Could not send your message, please contact us."
+format="<div class=\"foswikiNotification\">$message</div>"
+}%
 </verbatim>
 %ENDTWISTY%
 
 <form enctype="application/x-www-form-urlencoded" name="mailform" action="%SCRIPTURL{sendemail}%/%WEB%/%TOPIC%" method="POST">
-<input type="hidden" name="successsection" value="thanks" />
 <fieldset>
 <legend><b>Send Email</b></legend>
 <div class="foswikiFormSteps">
@@ -203,7 +198,11 @@ The search path for templates always starts in the current web.
 </div>
 </fieldset>
 </form>
-%SENDEMAIL%
+%SENDEMAIL{
+feedbackSuccess="Request sent, we'll contact you shortly."
+feedbackError="Could not send your message, please contact us."
+format="<div class=\"foswikiNotification\">$message</div>"
+}%
 
 %ADDTOHEAD{text="<style type=\"text/css\">
 #patternPage fieldset {
@@ -213,16 +212,8 @@ The search path for templates always starts in the current web.
 </style>
 "}%
 
-<!--
-%STARTSECTION{"thanks"}%
----+!! Notification
-%SENDEMAIL%
-<input type="button" value="Ok" class="foswikiButton" onclick="window.location.href='%URLPARAM{"origurl" default="%SCRIPTURLPATH{view}%/%BASEWEB%/%BASETOPIC%"}%'" />
-%ENDSECTION{"thanks"}%
--->
-
 ---+++ Example with <nop>FormPlugin
-This form asks for user information and validates that the password confirmation matches the password.
+This form asks for user information and validates that the fields are filled.
 
 %TWISTY{showlink=" Show code" hidelink=" Hide code" showimgleft="%ICONURLPATH{toggleopen}%" hideimgleft="%ICONURLPATH{toggleclose}%" mode="div"}%
 <verbatim>
@@ -258,18 +249,6 @@ type="text"
 mandatory="on"
 validate="email"
 title="E-mail Address:"
-}%
-%FORMELEMENT{
-name="Password"
-type="password"
-mandatory="on"
-title="Password (caps sensitive):"
-}%
-%FORMELEMENT{
-name="Confirm"
-type="password"
-mandatory="on"
-title="Confirm your password:"
 }%
 %FORMELEMENT{
 name="body"
@@ -340,18 +319,6 @@ validate="email"
 title="E-mail Address:"
 }%
 %FORMELEMENT{
-name="Password"
-type="password"
-mandatory="on"
-title="Password (caps sensitive):"
-}%
-%FORMELEMENT{
-name="Confirm"
-type="password"
-mandatory="on"
-title="Confirm your password:"
-}%
-%FORMELEMENT{
 name="body"
 type="textarea"
 rows="10"
@@ -370,7 +337,10 @@ buttonlabel="Send"
 </fieldset>
 %ENDFORM%
 
-%SENDEMAIL{feedbackSuccess="Request sent, we'll contact you shortly." feedbackError="Could not send your message, please contact us." }%
+%SENDEMAIL{
+feedbackSuccess="Request sent, we'll contact you shortly."
+feedbackError="Could not send your message, please contact us."
+}%
 
 <script type="text/javascript">
 //<![CDATA[
@@ -430,6 +400,7 @@ HTML elements with these style names are written to the default feedback.
 |  Version: | %$VERSION% |
 |  Release: | %$RELEASE% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  13 Mar 2010 | 1.5.2 Improved error feedback and documentation. |
 |  28 Feb 2010 | 1.5.1 Added forgotten =Config.spec= file. |
 |  08 Jan 2010 | 1.5 Arthur Clemens: Improved error feedback; added =format= parameter; moved the mail template to a topic; changed param =template= to =mailtemplate=. |
 |  03 Jan 2010 | 1.4.2 Arthur Clemens: Added configure settings to download. |
