@@ -304,6 +304,9 @@ feedbackError="Could not send your message, please contact us."
 }%
 
 ---++ FAQ
+---+++ How do I create linebreaks in the email body?
+Use the token =$n= to create newlines.
+
 ---+++ How do I send data form fields?
 If you have a [[%SYSTEMWEB%.DataForms][data form]] with the fields =Title= and =Summary= and want to post the values of these fields in the body of the e-mail, eiter:
    * put them in a hidden field:
