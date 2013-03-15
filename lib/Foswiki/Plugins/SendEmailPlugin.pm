@@ -17,10 +17,12 @@
 package Foswiki::Plugins::SendEmailPlugin;
 
 use strict;
-use Foswiki::Func;
+use warnings;
 
-our $VERSION           = '$Rev: 11069$';
-our $RELEASE           = '1.5.3';
+use Foswiki::Func();
+
+our $VERSION           = '1.5.4';
+our $RELEASE           = '1.5.4';
 our $pluginName        = 'SendEmailPlugin';
 our $SHORTDESCRIPTION  = "Send e-mails through an e-mail form";
 our $NO_PREFS_IN_TOPIC = 1;

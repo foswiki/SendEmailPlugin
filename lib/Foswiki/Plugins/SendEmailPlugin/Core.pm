@@ -22,9 +22,10 @@ package Foswiki::Plugins::SendEmailPlugin::Core;
 
 # Always use strict to enforce variable scoping
 use strict;
-use Foswiki;
-use Foswiki::Func;
-use Foswiki::Plugins;
+use warnings;
+use Foswiki ();
+use Foswiki::Func ();
+use Foswiki::Plugins ();
 use CGI qw( :all );
 
 use vars qw( $debug $emailRE );
@@ -299,6 +300,7 @@ HERE
     $mail =~ s/%CC%/$cc/go;
     $mail =~ s/%SUBJECT%/$subject/go;
     $mail =~ s/%BODY%/$body/go;
+    $mail =~ s/\nCC:\s*\n/\n/;
 
     _debug("mail=\n$mail");
 
@@ -461,12 +463,10 @@ sub _finishSendEmail {
 
 sub _addHeader {
 
-    my $header = <<'EOF';
-<style type="text/css" media="all">
-@import url("%PUBURL%/%SYSTEMWEB%/SendEmailPlugin/sendemailplugin.css");
-</style>
+    Foswiki::Func::addToZone('head', 'SENDEMAILPLUGIN', <<EOF );
+<link rel='stylesheet' href='%PUBURL%/%SYSTEMWEB%/SendEmailPlugin/sendemailplugin.css' media='all' />
 EOF
-    Foswiki::Func::addToHEAD( 'SENDEMAILPLUGIN', $header );
+
 }
 
 =pod

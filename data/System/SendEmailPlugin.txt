@@ -16,6 +16,7 @@
 <input type="hidden" name="subject" value="hello!" />
 Send to: <input class="foswikiInputField" name="to" size="30" type="text" value="email address..." />&nbsp;
 <input type="submit" class="foswikiSubmit" value="Send" />
+</form>
 
 %TWISTY{showlink=" Show code" hidelink=" Hide code" showimgleft="%ICONURLPATH{toggleopen}%" hideimgleft="%ICONURLPATH{toggleclose}%" mode="div"}%
 <verbatim>
@@ -352,6 +353,7 @@ HTML elements with these style names are written to the default feedback.
 |  Version: | %$VERSION% |
 |  Release: | %$RELEASE% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  15 Mar 2013 | 1.5.4 Michael Daum: don't send an empty CC; fix adding css to the header | 
 |  25 Aug 2011 | 1.5.3 Fixes a bug in the example form. |
 |  13 Mar 2010 | 1.5.2 Improved error feedback and documentation. |
 |  28 Feb 2010 | 1.5.1 Added forgotten =Config.spec= file. |
