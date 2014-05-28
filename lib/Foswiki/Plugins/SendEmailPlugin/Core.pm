@@ -287,6 +287,7 @@ From: %FROM%
 To: %TO%
 CC: %CC%
 Subject: %SUBJECT%
+Auto-Submitted: auto-generated
 
 %BODY%
 HERE
