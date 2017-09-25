@@ -1,6 +1,6 @@
-%META:TOPICINFO{author="ProjectContributor" comment="" date="1262991297" format="1.1" reprev="1.2" version="1.2"}%
+%META:TOPICINFO{author="ProjectContributor" comment="" date="1262991297" format="1.1" reprev="1.2" version="1"}%
 ---+!! Send Email Plugin
-%$SHORTDESCRIPTION%.
+%FORMFIELD{"Description"}%.
 
 <img src="%PUBURLPATH%/%WEB%/%TOPIC%/screenshot.png" alt="Screenshot" width='797' height='378' />
 
@@ -329,11 +329,7 @@ Summary: %FORMFIELD{"Summary"}%
    * !SendEmailPlugin is %IF{"context SendEmailPluginEnabled" then='%GREEN%enabled%ENDCOLOR%' else='%RED%not enabled%ENDCOLOR%'}%.
 
 #PluginSettings
----++ Plugin Settings
-<!--
-   * Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
--->
-   * Plugin settings are set in [[%SCRIPTURLPATH{configure}%#SendEmailPlugin$Extensions][configure]].
+---++ Plugin Settings   * Plugin settings are set in [[%SCRIPTURLPATH{configure}%#SendEmailPlugin$Extensions][configure]].
    * Note: by default any emailing is prohibited. Change the settings in configure to set to which addresses you allow mails to be sent from and to.
 
 ---++ CSS classes
@@ -343,29 +339,24 @@ HTML elements with these style names are written to the default feedback.
 | =sendEmailPluginError=         | Styles =sendEmailPluginNotification= in case of an error   |
 
 
----++ Plugin Installation Instructions
+---++ Installation Instructions
 %$INSTALL_INSTRUCTIONS%
 
----++ Plugin Info
-
-|  Plugin Author: | Foswiki:Main.ArthurClemens |
-|  Copyright: | &copy; 2007-2010 Arthur Clemens; 2008 Michael Daum |
-|  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
-|  Version: | %$VERSION% |
-|  Release: | %$RELEASE% |
-|  Change History: | <!-- versions below in reverse order -->&nbsp; |
-|  15 Mar 2013 | 1.5.4 Michael Daum: don't send an empty CC; fix adding css to the header | 
-|  25 Aug 2011 | 1.5.3 Fixes a bug in the example form. |
-|  13 Mar 2010 | 1.5.2 Improved error feedback and documentation. |
-|  28 Feb 2010 | 1.5.1 Added forgotten =Config.spec= file. |
+---++ Change History
+%TABLE{columnwidths="7em" tablewidth="100%"}%
+|  09 Sep 2017 | 1.55 fix switchboard configuration |
+|  15 Mar 2013 | 1.54 Michael Daum: don't send an empty CC; fix adding css to the header | 
+|  25 Aug 2011 | 1.53 Fixes a bug in the example form. |
+|  13 Mar 2010 | 1.52 Improved error feedback and documentation. |
+|  28 Feb 2010 | 1.51 Added forgotten =Config.spec= file. |
 |  08 Jan 2010 | 1.5 Arthur Clemens: Improved error feedback; added =format= parameter; moved the mail template to a topic; changed param =template= to =mailtemplate=. |
-|  03 Jan 2010 | 1.4.2 Arthur Clemens: Added configure settings to download. |
-|  29 Mar 2009 | 1.4.1 Arthur Clemens: Removed default restrictions in =Deny= settings so that only the =Allow= setting needs to be set to send emails. |
+|  03 Jan 2010 | 1.42 Arthur Clemens: Added configure settings to download. |
+|  29 Mar 2009 | 1.41 Arthur Clemens: Removed default restrictions in =Deny= settings so that only the =Allow= setting needs to be set to send emails. |
 |  21 Mar 2009 | 1.4 Arthur Clemens: Moved topic and hardcoded settings to configure. | 
 |  12 Mar 2009 | 1.3 Foswiki version. |
-|  06 Nov 2008 | 1.2.3 Michael Daum: Fixed CC emails; fixed css in docu |
-|  17 Oct 2008 | 1.2.1 Michael Daum: Added support for TWiki-5; fixed sending emails to login names |
-|  26 Jun 2008 | 1.2.0 Michael Daum: \
+|  06 Nov 2008 | 1.23 Michael Daum: Fixed CC emails; fixed css in docu |
+|  17 Oct 2008 | 1.21 Michael Daum: Added support for TWiki-5; fixed sending emails to login names |
+|  26 Jun 2008 | 1.20 Michael Daum: \
                  Added ALLOW/DENY preference settings to prevent this plugin from being used as an open spam relay; \
                  added =template= option allowing more control over email header etc; \
                  fixed mod_perl/perperl coding errors;\
@@ -374,18 +365,20 @@ HTML elements with these style names are written to the default feedback.
                  allow multiple users in To and Cc; \
                  added a =redirectto=, =successsection= and =errorsection= options to land on a different feedback page; \
                  reorganized code for lazy compilation |
-|  16 may 2007 | 1.1.3 Arthur Clemens: Fixed bug in bin script that caused form query data to get emptied. |
-|  15 may 2007 | 1.1.2 Arthur Clemens: Improved error notifications. |
-|  13 May 2007 | 1.1.1 Arthur Clemens: Changed sendmail script invocation to be called through bin script =sendemail=; added CSS styles for feedback notification; fixed typo 'feedbackSucces'. |
+|  16 may 2007 | 1.13 Arthur Clemens: Fixed bug in bin script that caused form query data to get emptied. |
+|  15 may 2007 | 1.12 Arthur Clemens: Improved error notifications. |
+|  13 May 2007 | 1.11 Arthur Clemens: Changed sendmail script invocation to be called through bin script =sendemail=; added CSS styles for feedback notification; fixed typo 'feedbackSucces'. |
 |  05 May 2007 | 1.0 First release. |
-|  Foswiki Dependency: | %$DEPENDENCIES% |
-|  CPAN Dependencies: | none |
-|  Other Dependencies: | none |
-|  Perl Version: | 5.005 |
-|  Plugin Home: | http://foswiki.org/Extensions/%TOPIC% |
-|  Support: | http://foswiki.org/Support/%TOPIC% |
-|  Development: | http://foswiki.org/Development/%TOPIC% |
 
 
+%META:FORM{name="PackageForm"}%
+%META:FIELD{name="Author" title="Author" value="Foswiki:Main.ArthurClemens"}%
+%META:FIELD{name="Copyright" title="Copyright" value="&copy; 2007-2010 Arthur Clemens; 2007-2017 Foswiki Contributors"}%
+%META:FIELD{name="Description" title="Description" value="%25$SHORTDESCRIPTION%25"}%
+%META:FIELD{name="Home" title="Home" value="https://foswiki.org/Extensions/%TOPIC%"}%
+%META:FIELD{name="License" title="License" value="GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]])"}%
+%META:FIELD{name="Release" title="Release" value="%$RELEASE%"}%
+%META:FIELD{name="Repository" title="Repository" value="https://github.com/foswiki/%TOPIC%"}%
+%META:FIELD{name="Support" title="Support" value="https://foswiki.org/Support/%TOPIC%"}%
+%META:FIELD{name="Version" title="Version" value="%$VERSION%"}%
 %META:FILEATTACHMENT{name="screenshot.png" attr="" autoattached="1" comment="" date="1262991210" path="screenshot.png" size="16751" version=""}%
-%META:FILEATTACHMENT{name="sendemailplugin.css" attr="" autoattached="1" comment="" date="1237669972" path="sendemailplugin.css" size="350" version=""}%

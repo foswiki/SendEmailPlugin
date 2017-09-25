@@ -1,0 +1,12 @@
+igp_*
+genpdf_*
+*,v
+*.swp
+/SendEmailPlugin.md5
+/SendEmailPlugin.sha1
+/SendEmailPlugin.tgz
+/SendEmailPlugin.txt
+/SendEmailPlugin.zip
+/SendEmailPlugin_installer
+/SendEmailPlugin_installer.pl
+locale/**/*.mo

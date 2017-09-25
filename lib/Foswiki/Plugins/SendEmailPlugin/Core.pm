@@ -1,6 +1,7 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
-# Copyright (c) 2007-2010 by Arthur Clemens, Michael Daum
+# Copyright (c) 2007-2010 by Arthur Clemens
+# Copyright (c) 2007-2017 Foswiki Contributors
 #
 # and Foswiki Contributors. All Rights Reserved. Foswiki Contributors
 # are listed in the AUTHORS file in the root of this distribution.

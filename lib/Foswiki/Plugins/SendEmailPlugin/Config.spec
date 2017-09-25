@@ -62,11 +62,9 @@ $Foswiki::cfg{Plugins}{SendEmailPlugin}{Messages}{NoPermissionCc}{en} = 'No perm
 #
 # **PERL**
 # This setting is required to enable executing the compare script from the bin directory
-$Foswiki::cfg{SwitchBoard}{sendemail} = [
-          'Foswiki::Plugins::SendEmailPlugin::Core',
-          'sendEmail',
-          {
-            'sendemail' => 1
-          }
-        ];
+$Foswiki::cfg{SwitchBoard}{sendemail} = {
+  package => 'Foswiki::Plugins::SendEmailPlugin::Core', 
+  function => 'sendEmail', 
+  context => { 'sendemail' => 1 } 
+};
 1;
