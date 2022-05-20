@@ -1,7 +1,7 @@
 # Plugin for Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 #
 # Copyright (c) 2007-2010 by Arthur Clemens
-# Copyright (c) 2007-2017 Foswiki Contributors
+# Copyright (c) 2007-2022 Foswiki Contributors
 #
 # and Foswiki Contributors. All Rights Reserved. Foswiki Contributors
 # are listed in the AUTHORS file in the root of this distribution.
@@ -27,9 +27,9 @@ use warnings;
 use Foswiki ();
 use Foswiki::Func ();
 use Foswiki::Plugins ();
-use CGI qw( :all );
 
-use vars qw( $debug $emailRE );
+our $debug;
+our $emailRE;
 
 my $ERROR_STATUS_TAG             = 'SendEmailErrorStatus';
 my $ERROR_MESSAGE_TAG            = 'SendEmailErrorMessage';
@@ -60,8 +60,8 @@ writes a debug message if the $debug flag is set
 =cut
 
 sub _debug {
-    Foswiki::Func::writeDebug("SendEmailPlugin -- $_[0]")
-      if $debug;
+    return unless $debug;
+    Foswiki::Func::writeDebug("SendEmailPlugin - $_[0]")
 }
 
 =pod
@@ -113,9 +113,9 @@ Invoked by bin/sendemail
 sub sendEmail {
     my $session = shift;
 
-    _debug("sendEmail");
-
     init($session);
+
+    _debug("sendEmail");
 
     my $query        = Foswiki::Func::getCgiQuery();
     my $errorMessage = '';
@@ -280,14 +280,15 @@ sub sendEmail {
     # remove 'Template' at end - stupid TWiki solution from the old days
     $templateName =~ s/^(.*?)Template$/$1/;
 
-    my $template = Foswiki::Func::readTemplate($templateName);
     _debug("templateName=$templateName");
+    my $template = Foswiki::Func::readTemplate($templateName);
     unless ($template) {
         $template = <<'HERE';
 From: %FROM%
 To: %TO%
 CC: %CC%
 Subject: %SUBJECT%
+Content-Type: text/plain; charset="UTF-8"
 Auto-Submitted: auto-generated
 
 %BODY%
@@ -455,7 +456,23 @@ sub _finishSendEmail {
     $redirectUrl ||= $origUrl;
     $redirectUrl = "$redirectUrl#$NOTIFICATION_ANCHOR_NAME";
 
-    Foswiki::Func::redirectCgiQuery( undef, $redirectUrl, 1 );
+    if ($query->header('X-Requested-With') eq 'XMLHttpRequest') {
+      #print STDERR "requested via ajax: errorStatus=$errorStatus errorMessage=".($errorMessage//'undef')."\n";
+
+      my $message = "Status: $errorStatus - $errorMessage";
+
+      if ($section) {
+        $message = Foswiki::Func::expandCommonVariables("%INCLUDE{\"$web.$topic\" section=\"$section\"}%", $topic, $web);
+        $message = Foswiki::Func::renderText($message, $web, $topic);
+      }
+      #print STDERR "message=$message\n";
+
+      $session->{response}->print($message);
+
+    } else {
+      Foswiki::Func::redirectCgiQuery( $query, $redirectUrl, 1 );
+    }
+
     return 0;
 }
 
@@ -486,7 +503,7 @@ sub _createNotificationMessage {
     $cssClass .= ' ' . $NOTIFICATION_ERROR_CSS_CLASS
       if ( $errorStatus == $ERROR_STATUS{'error'} );
 
-    return CGI::div( { class => $cssClass }, "$text $errorMessage" );
+    return "<div class='$cssClass'>$text $errorMessage</div>"
 }
 
 =pod
@@ -496,7 +513,7 @@ sub _createNotificationMessage {
 sub _wrapHtmlNotificationContainer {
     my ($notificationMessage) = @_;
 
-    return CGI::a( { name => $NOTIFICATION_ANCHOR_NAME }, '<!--#-->' ) . "\n"
+    return "<a name='$NOTIFICATION_ANCHOR_NAME' />\n"
       . $notificationMessage;
 }
 

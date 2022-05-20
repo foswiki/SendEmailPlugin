@@ -1,4 +1,4 @@
-%META:TOPICINFO{author="ProjectContributor" comment="" date="1262991297" format="1.1" reprev="1.2" version="1"}%
+%META:TOPICINFO{author="ProjectContributor" comment="reprev" date="1652974852" format="1.1" version="1"}%
 ---+!! Send Email Plugin
 %FORMFIELD{"Description"}%.
 
@@ -48,7 +48,6 @@ The HTML form encapsulates the data to be sent, each part passed as a form field
 
 Note, that the =from=, =to= and =cc= parameters can be either an email address or a wiki user name, in which case the email address of that wiki user is used instead.
 
-%TABLE{tablewidth="100%" columnwidths="15%,5%,25%,55%" sort="off" headerbg="#f5f5f5" databg="#ffffff" headercolor="#333333"}%
 | *Element* | *Required* | *Description* | *Example* |
 | =name,method=   | Required | A form must have a name; send method is POST. | |
 | =action=  | Required | Must call =sendemail= script | =action="%<nop>SCRIPTURL{sendemail}%/%<nop>WEB%/%<nop>TOPIC%"= |
@@ -61,7 +60,6 @@ Note, that the =from=, =to= and =cc= parameters can be either an email address o
 | =redirectto= field | Optional | (Presumably) hidden field. If passed, after a sent success or error, the page gets redirected to this url. | =&lt;input type="hidden" name="redirectto" value="%<nop>SCRIPTURL{view}%/%<nop>WEB%/MailFeedback" /&gt;= |
 | =successsection= field | Optional | (Presumably) hidden field. Will display a named section (that you define using =STARTSECTION= and =ENDSECTION= after a successful sent. | =&lt;input type="hidden" name="successsection" value="feedbackYes" /&gt;= |
 | =errorsection= field | Optional | (Presumably) hidden field. Will display a named section (that you define using =STARTSECTION= and =ENDSECTION= after an unsuccessful sent. | =&lt;input type="hidden" name="errorsection" value="feedbackNo" /&gt;= |
-
 
 ---+++ Allow/restrict settings
 To prevent this plugin to be used as open email relay, by default sending emails is prohibited. To send out mails, first set the mail addresses you want to allow to send to in [[%SCRIPTURLPATH{configure}%#SendEmailPlugin$Extensions][configure]]. Each can be a list of comma separated regular expressions that emails are checked against before allowing the mail to be sent.
@@ -101,7 +99,6 @@ will write a feedback message (if any), using the default message strings set in
 
 The message can be tailored using SENDEMAIL parameters:
 
-%TABLE{tablewidth="100%" columnwidths="15%,35%,55%" sort="off" headerbg="#f5f5f5" databg="#ffffff" headercolor="#333333"}%
 | *Parameter* | *Description* | *Example* |
 | =feedbackSuccess= | Message string in case of successful send. | =feedbackSuccess="Request sent, we'll contact you shortly."= | 
 | =feedbackError= | Message string in case of unsuccessful send. | =feedbackError="Could not send your message, please contact us."= | 
@@ -140,8 +137,6 @@ The search path for templates always starts in the current web.
 %TWISTY{showlink=" Show code" hidelink=" Hide code" showimgleft="%ICONURLPATH{toggleopen}%" hideimgleft="%ICONURLPATH{toggleclose}%" mode="div"}%
 <verbatim>
 <form enctype="application/x-www-form-urlencoded" name="mailform1" action="%SCRIPTURL{sendemail}%/%WEB%/%TOPIC%" method="POST">
-<fieldset>
-<legend><b>Send Email</b></legend>
 <div class="foswikiFormSteps">
 <div class="foswikiFormStep">
 <h3>To:</h3>
@@ -163,7 +158,6 @@ The search path for templates always starts in the current web.
 <input type="submit" class="foswikiSubmit" value="Send" />
 </div>
 </div>
-</fieldset>
 </form>
 %SENDEMAIL{
 feedbackSuccess="Request sent, we'll contact you shortly."
@@ -174,8 +168,6 @@ format="<div class=\"foswikiNotification\">$message</div>"
 %ENDTWISTY%
 
 <form enctype="application/x-www-form-urlencoded" name="mailform" action="%SCRIPTURL{sendemail}%/%WEB%/%TOPIC%" method="POST">
-<fieldset>
-<legend><b>Send Email</b></legend>
 <div class="foswikiFormSteps">
 <div class="foswikiFormStep">
 ---+++!! To:
@@ -197,7 +189,6 @@ format="<div class=\"foswikiNotification\">$message</div>"
 <input type="submit" class="foswikiSubmit" value="Send" />
 </div>
 </div>
-</fieldset>
 </form>
 %SENDEMAIL{
 feedbackSuccess="Request sent, we'll contact you shortly."
@@ -223,9 +214,6 @@ name="mailForm"
 action="%SCRIPTURL{sendemail}%/%WEB%/%TOPIC%"
 method="POST"
 }%
-<fieldset style="border:1px solid #ddd; padding:1em">
-<legend><b>Send Email</b></legend>
-%RED%*%ENDCOLOR% All fields are required.
 %FORMELEMENT{
    name="Subject"
    type="hidden"
@@ -254,7 +242,6 @@ Email: $Email"
    type="submit"
    buttonlabel="Send"
 }%
-</fieldset>
 %ENDFORM%
 
 %SENDEMAIL{feedbackSuccess="Request sent, we'll contact you shortly." feedbackError="Could not send your message, please contact us." }%
@@ -266,9 +253,6 @@ name="mailForm"
 action="%SCRIPTURL{sendemail}%/%WEB%/%TOPIC%"
 method="POST"
 }%
-<fieldset style="border:1px solid #ddd; padding:1em">
-<legend><b>Send Email</b></legend>
-%RED%*%ENDCOLOR% All fields are required.
 %FORMELEMENT{
    name="Subject"
    type="hidden"
@@ -297,7 +281,6 @@ Email: $Email"
    type="submit"
    buttonlabel="Send"
 }%
-</fieldset>
 %ENDFORM%
 
 %SENDEMAIL{
@@ -323,14 +306,14 @@ Summary: %FORMFIELD{"Summary"}%
 </textarea>
 </verbatim>
 
-
 #PluginTest
 ---++ Plugin test
-   * !SendEmailPlugin is %IF{"context SendEmailPluginEnabled" then='%GREEN%enabled%ENDCOLOR%' else='%RED%not enabled%ENDCOLOR%'}%.
+   * !SendEmailPlugin is %IF{"context SendEmailPluginEnabled" then="$percntGREEN$percntenabled$percntENDCOLOR$percnt" else="$percntRED$percntnot enabled$percntENDCOLOR$percnt"}%.
 
 #PluginSettings
----++ Plugin Settings   * Plugin settings are set in [[%SCRIPTURLPATH{configure}%#SendEmailPlugin$Extensions][configure]].
-   * Note: by default any emailing is prohibited. Change the settings in configure to set to which addresses you allow mails to be sent from and to.
+---++ Plugin Settings   
+Plugin settings are set in [[%SCRIPTURLPATH{configure}%#SendEmailPlugin$Extensions][configure]].
+Note: by default any emailing is prohibited. Change the settings in configure to set to which addresses you allow mails to be sent from and to.
 
 ---++ CSS classes
 HTML elements with these style names are written to the default feedback. 
@@ -338,12 +321,12 @@ HTML elements with these style names are written to the default feedback.
 | =sendEmailPluginNotification=  | Used for feedback after sending a mail  |
 | =sendEmailPluginError=         | Styles =sendEmailPluginNotification= in case of an error   |
 
-
 ---++ Installation Instructions
 %$INSTALL_INSTRUCTIONS%
 
 ---++ Change History
 %TABLE{columnwidths="7em" tablewidth="100%"}%
+|  20 May 2022 | 2.00 Michael Daum: remove dependency on CGI for rendering html; use utf8 encoding when sending emails; support ajax-sending mail forms |
 |  09 Sep 2017 | 1.55 fix switchboard configuration |
 |  15 Mar 2013 | 1.54 Michael Daum: don't send an empty CC; fix adding css to the header | 
 |  25 Aug 2011 | 1.53 Fixes a bug in the example form. |
@@ -373,12 +356,12 @@ HTML elements with these style names are written to the default feedback.
 
 %META:FORM{name="PackageForm"}%
 %META:FIELD{name="Author" title="Author" value="Foswiki:Main.ArthurClemens"}%
-%META:FIELD{name="Copyright" title="Copyright" value="&copy; 2007-2010 Arthur Clemens; 2007-2017 Foswiki Contributors"}%
+%META:FIELD{name="Version" title="Version" value="%25$VERSION%25"}%
+%META:FIELD{name="Release" title="Release" value="%25$RELEASE%25"}%
 %META:FIELD{name="Description" title="Description" value="%25$SHORTDESCRIPTION%25"}%
-%META:FIELD{name="Home" title="Home" value="https://foswiki.org/Extensions/%TOPIC%"}%
+%META:FIELD{name="Repository" title="Repository" value="https://github.com/foswiki/%25TOPIC%25"}%
+%META:FIELD{name="Copyright" title="Copyright" value="&copy; 2007-2010 Arthur Clemens; 2007-2022 Foswiki Contributors"}%
 %META:FIELD{name="License" title="License" value="GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]])"}%
-%META:FIELD{name="Release" title="Release" value="%$RELEASE%"}%
-%META:FIELD{name="Repository" title="Repository" value="https://github.com/foswiki/%TOPIC%"}%
-%META:FIELD{name="Support" title="Support" value="https://foswiki.org/Support/%TOPIC%"}%
-%META:FIELD{name="Version" title="Version" value="%$VERSION%"}%
+%META:FIELD{name="Home" title="Home" value="https://foswiki.org/Extensions/%25TOPIC%25"}%
+%META:FIELD{name="Support" title="Support" value="https://foswiki.org/Support/%25TOPIC%25"}%
 %META:FILEATTACHMENT{name="screenshot.png" attr="" autoattached="1" comment="" date="1262991210" path="screenshot.png" size="16751" version=""}%

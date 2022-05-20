@@ -4,6 +4,7 @@ From: %FROM%
 To: %TO%
 CC: %CC%
 Subject: %SUBJECT%
+Content-Type: text/plain; charset="UTF-8"
 Auto-Submitted: auto-generated
 
 %BODY%
